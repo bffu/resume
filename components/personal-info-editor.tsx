@@ -12,6 +12,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -19,6 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Icon } from "@iconify/react";
+import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 import type { PersonalInfoItem, PersonalInfoSection } from "@/types/resume";
 import { createNewPersonalInfoItem } from "@/lib/resume-utils";
 import IconPicker from "./icon-picker";
@@ -48,6 +59,35 @@ export default function PersonalInfoEditor({
 
   // 提取personalInfo到局部变量以简化代码，如果personalInfoSection不存在则使用空数组
   const personalInfo = personalInfoSection?.personalInfo || [];
+
+  /**
+   * 处理拖拽排序结束事件
+   */
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+
+    const source = result.source;
+    const destination = result.destination;
+
+    if (source.index === destination.index) return;
+
+    const sortedPersonalInfo = [...personalInfo]
+      .sort((a, b) => a.order - b.order);
+
+    const [movedItem] = sortedPersonalInfo.splice(source.index, 1);
+    sortedPersonalInfo.splice(destination.index, 0, movedItem);
+
+    // 更新order字段
+    const updatedPersonalInfo = sortedPersonalInfo.map((item, index) => ({
+      ...item,
+      order: index
+    }));
+
+    onUpdate({
+      ...personalInfoSection,
+      personalInfo: updatedPersonalInfo
+    }, avatarUrl);
+  };
 
   /**
    * 切换标签显示
@@ -233,16 +273,38 @@ export default function PersonalInfoEditor({
         </div>
 
         {/* 个人信息项列表 */}
-        <div className="space-y-3">
-          {personalInfo.map((item) => (
-            <PersonalInfoItemEditor
-              key={item.id}
-              item={item}
-              onUpdate={(updates) => updatePersonalInfoItem(item.id, updates)}
-              onRemove={() => removePersonalInfoItem(item.id)}
-            />
-          ))}
-        </div>
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="personal-info-list">
+            {(provided) => (
+              <div ref={provided.innerRef} {...provided.droppableProps} className="space-y-3">
+                {personalInfo
+                  .sort((a, b) => a.order - b.order)
+                  .map((item, index) => (
+                    <Draggable key={item.id} draggableId={item.id} index={index}>
+                      {(provided, snapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          className={snapshot.isDragging ? 'opacity-50' : ''}
+                        >
+                          <div className="flex-1">
+                            <PersonalInfoItemEditor
+                              item={item}
+                              onUpdate={(updates) => updatePersonalInfoItem(item.id, updates)}
+                              onRemove={() => removePersonalInfoItem(item.id)}
+                              dragHandleProps={provided.dragHandleProps}
+                              isDragging={snapshot.isDragging}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
 
         {personalInfo.length === 0 && (
           <div className="text-center py-8 text-muted-foreground">
@@ -272,13 +334,19 @@ interface PersonalInfoItemEditorProps {
   item: PersonalInfoItem;
   onUpdate: (updates: Partial<PersonalInfoItem>) => void;
   onRemove: () => void;
+  dragHandleProps?: any;
+  isDragging?: boolean;
 }
 
 function PersonalInfoItemEditor({
   item,
   onUpdate,
   onRemove,
+  dragHandleProps,
+  isDragging,
 }: PersonalInfoItemEditorProps) {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
   return (
     <div className="flex items-start gap-3 p-3 border rounded-lg bg-muted/30">
       {/* 图标选择 */}
@@ -311,7 +379,7 @@ function PersonalInfoItemEditor({
         </DialogContent>
       </Dialog>
 
-      {/* 单行布局：标签 | 类型 | 值输入 | 删除 */}
+      {/* 单行布局：标签 | 类型 | 值输入 | 删除 | 拖拽手柄 */}
       <div className="flex-1 flex items-end gap-4">
         {/* 标签 */}
         <div className="w-36 flex-shrink-0">
@@ -344,10 +412,10 @@ function PersonalInfoItemEditor({
         </div>
 
         {/* 值输入 */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           {item.value.type === "link" ? (
-            <div className="flex gap-6 h-8">
-              <div className="flex-2 h-8 flex flex-col justify-end">
+            <div className="flex gap-2 h-8">
+              <div className="flex-1 h-8 flex flex-col justify-end">
                 <Input
                   value={item.value.content}
                   onChange={(e) => onUpdate({ value: { ...item.value, content: e.target.value } })}
@@ -376,18 +444,51 @@ function PersonalInfoItemEditor({
           )}
         </div>
 
-        {/* 删除按钮 */}
-        <div className="flex-shrink-0">
+        {/* 删除按钮和拖拽手柄组 */}
+        <div className="flex items-center gap-1">
+          {/* 删除按钮 */}
           <Button
             variant="ghost"
             size="sm"
-            onClick={onRemove}
+            onClick={() => setShowDeleteConfirm(true)}
             className="icon-button text-destructive hover:text-destructive h-8 w-8 p-0"
           >
             <Icon icon="mdi:delete" className="w-4 h-4" />
           </Button>
+          
+          {/* 拖拽手柄 */}
+          <div
+            {...dragHandleProps}
+            className={`flex items-center justify-center w-8 h-8 rounded cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground ${isDragging ? 'text-foreground' : ''}`}
+          >
+            <Icon icon="mdi:drag" className="w-4 h-4" />
+          </div>
         </div>
       </div>
+
+      {/* 删除确认对话框 */}
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认删除</AlertDialogTitle>
+            <AlertDialogDescription>
+              您确定要删除这个个人信息项吗？此操作无法撤销。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                onRemove();
+                setShowDeleteConfirm(false);
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              删除
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

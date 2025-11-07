@@ -22,6 +22,8 @@ export interface PersonalInfoItem {
   icon?: string
   /** 唯一标识符 */
   id: string
+  /** 排序顺序 */
+  order: number
 }
 
 /**
