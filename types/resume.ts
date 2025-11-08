@@ -79,46 +79,28 @@ export interface JobIntentionSection {
   enabled: boolean
 }
 
-// 文本样式定义
-export interface TextStyle {
-  /** 字体 */
-  fontFamily?: string
-  /** 字号（pt） */
-  fontSize?: number
-  /** 字体颜色 */
-  color?: string
-  /** 加粗 */
-  bold?: boolean
-  /** 斜体 */
-  italic?: boolean
-  /** 行内代码样式 */
-  code?: boolean
+// Tiptap JSON Content 类型（从 @tiptap/core 导入）
+export interface JSONContent {
+  type?: string
+  attrs?: Record<string, any>
+  content?: JSONContent[]
+  marks?: {
+    type: string
+    attrs?: Record<string, any>
+    [key: string]: any
+  }[]
+  text?: string
+  [key: string]: any
 }
 
-// 文本片段 - 富文本的最小单元
-export interface TextSegment {
-  /** 唯一标识符 */
-  id: string
-  /** 文本内容 */
-  text: string
-  /** 样式 */
-  style: TextStyle
-}
-
-// 内容元素 - 一行中的一列
+// 内容元素 - 一行中的一列（使用 Tiptap JSON 格式）
 export interface ModuleContentElement {
   /** 唯一标识符 */
   id: string
-  /** 元素类型 */
-  type: 'text' | 'bullet-list' | 'numbered-list'
-  /** 富文本内容（由多个片段组成） */
-  segments: TextSegment[]
+  /** Tiptap JSON 格式的富文本内容 */
+  content: JSONContent
   /** 该元素在行中的位置索引（0-3） */
   columnIndex: number
-  /** 对齐方式（应用于整个元素） */
-  align?: 'left' | 'center' | 'right' | 'justify'
-  /** 如果是列表类型，缩进级别（0-3） */
-  indent?: number
 }
 
 // 内容行 - 一行可以包含1-4列

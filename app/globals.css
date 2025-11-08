@@ -5,39 +5,71 @@
 
 :root {
   /* 更新颜色系统为简历编辑器专用的绿色主题 */
-  --background: oklch(1 0 0); /* #ffffff */
-  --foreground: oklch(0.35 0.01 258.34); /* #475569 */
-  --card: oklch(0.97 0.01 258.34); /* #f1f5f9 */
-  --card-foreground: oklch(0.35 0.01 258.34); /* #475569 */
-  --popover: oklch(1 0 0); /* #ffffff */
-  --popover-foreground: oklch(0.35 0.01 258.34); /* #475569 */
-  --primary: oklch(0.45 0.15 162.4); /* #059669 */
-  --primary-foreground: oklch(1 0 0); /* #ffffff */
-  --secondary: oklch(0.55 0.15 162.4); /* #10b981 */
-  --secondary-foreground: oklch(1 0 0); /* #ffffff */
-  --muted: oklch(0.97 0.01 258.34); /* #f1f5f9 */
-  --muted-foreground: oklch(0.35 0.01 258.34); /* #475569 */
-  --accent: oklch(0.55 0.15 162.4); /* #10b981 */
-  --accent-foreground: oklch(1 0 0); /* #ffffff */
-  --destructive: oklch(0.5 0.22 12.17); /* #be123c */
-  --destructive-foreground: oklch(1 0 0); /* #ffffff */
-  --border: oklch(0.9 0 0); /* #e4e4e4 */
-  --input: oklch(1 0 0); /* #ffffff */
-  --ring: oklch(0.45 0.15 162.4 / 0.5); /* rgba(9, 150, 105, 0.5) */
-  --chart-1: oklch(0.45 0.15 162.4); /* #059669 */
-  --chart-2: oklch(0.55 0.15 162.4); /* #10b981 */
-  --chart-3: oklch(0.9 0 0); /* #e4e4e4 */
-  --chart-4: oklch(0.97 0.01 258.34); /* #f1f5f9 */
-  --chart-5: oklch(0.35 0.01 258.34); /* #475569 */
+  --background: oklch(1 0 0);
+  /* #ffffff */
+  --foreground: oklch(0.35 0.01 258.34);
+  /* #475569 */
+  --card: oklch(0.97 0.01 258.34);
+  /* #f1f5f9 */
+  --card-foreground: oklch(0.35 0.01 258.34);
+  /* #475569 */
+  --popover: oklch(1 0 0);
+  /* #ffffff */
+  --popover-foreground: oklch(0.35 0.01 258.34);
+  /* #475569 */
+  --primary: oklch(0.45 0.15 162.4);
+  /* #059669 */
+  --primary-foreground: oklch(1 0 0);
+  /* #ffffff */
+  --secondary: oklch(0.55 0.15 162.4);
+  /* #10b981 */
+  --secondary-foreground: oklch(1 0 0);
+  /* #ffffff */
+  --muted: oklch(0.97 0.01 258.34);
+  /* #f1f5f9 */
+  --muted-foreground: oklch(0.35 0.01 258.34);
+  /* #475569 */
+  --accent: oklch(0.55 0.15 162.4);
+  /* #10b981 */
+  --accent-foreground: oklch(1 0 0);
+  /* #ffffff */
+  --destructive: oklch(0.5 0.22 12.17);
+  /* #be123c */
+  --destructive-foreground: oklch(1 0 0);
+  /* #ffffff */
+  --border: oklch(0.9 0 0);
+  /* #e4e4e4 */
+  --input: oklch(1 0 0);
+  /* #ffffff */
+  --ring: oklch(0.45 0.15 162.4 / 0.5);
+  /* rgba(9, 150, 105, 0.5) */
+  --chart-1: oklch(0.45 0.15 162.4);
+  /* #059669 */
+  --chart-2: oklch(0.55 0.15 162.4);
+  /* #10b981 */
+  --chart-3: oklch(0.9 0 0);
+  /* #e4e4e4 */
+  --chart-4: oklch(0.97 0.01 258.34);
+  /* #f1f5f9 */
+  --chart-5: oklch(0.35 0.01 258.34);
+  /* #475569 */
   --radius: 0.5rem;
-  --sidebar: oklch(1 0 0); /* #ffffff */
-  --sidebar-foreground: oklch(0.35 0.01 258.34); /* #475569 */
-  --sidebar-primary: oklch(0.45 0.15 162.4); /* #059669 */
-  --sidebar-primary-foreground: oklch(1 0 0); /* #ffffff */
-  --sidebar-accent: oklch(0.55 0.15 162.4); /* #10b981 */
-  --sidebar-accent-foreground: oklch(1 0 0); /* #ffffff */
-  --sidebar-border: oklch(0.9 0 0); /* #e4e4e4 */
-  --sidebar-ring: oklch(0.45 0.15 162.4 / 0.5); /* rgba(9, 150, 105, 0.5) */
+  --sidebar: oklch(1 0 0);
+  /* #ffffff */
+  --sidebar-foreground: oklch(0.35 0.01 258.34);
+  /* #475569 */
+  --sidebar-primary: oklch(0.45 0.15 162.4);
+  /* #059669 */
+  --sidebar-primary-foreground: oklch(1 0 0);
+  /* #ffffff */
+  --sidebar-accent: oklch(0.55 0.15 162.4);
+  /* #10b981 */
+  --sidebar-accent-foreground: oklch(1 0 0);
+  /* #ffffff */
+  --sidebar-border: oklch(0.9 0 0);
+  /* #e4e4e4 */
+  --sidebar-ring: oklch(0.45 0.15 162.4 / 0.5);
+  /* rgba(9, 150, 105, 0.5) */
 }
 
 .dark {
@@ -47,7 +79,8 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.145 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.55 0.15 162.4); /* 深色模式下的绿色主题 */
+  --primary: oklch(0.55 0.15 162.4);
+  /* 深色模式下的绿色主题 */
   --primary-foreground: oklch(0.145 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
@@ -118,6 +151,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -148,7 +182,7 @@
   .resume-preview {
     @apply w-3xl mx-auto bg-white shadow-lg p-8;
   }
-  
+
   .pdf-preview-container {
     @apply w-full h-[70vh] overflow-hidden;
   }
@@ -176,7 +210,7 @@
   .icon-button {
     @apply inline-flex items-center justify-center w-8 rounded-md hover:bg-accent/10 transition-colors;
   }
-  
+
   .icon-button-personal-info {
     @apply inline-flex items-center justify-center w-8 h-[72px] rounded-md hover:bg-accent/10 transition-colors;
   }
@@ -184,3 +218,6 @@
 
 /* 导入打印样式 */
 @import url("../styles/print.css");
+
+/* 导入 Tiptap 样式 */
+@import url("../styles/tiptap.css");

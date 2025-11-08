@@ -1,143 +1,158 @@
-import type { ResumeModule, ModuleContentRow, ModuleContentElement } from "@/types/resume"
+import type { ResumeData, ModuleContentElement, JSONContent } from "@/types/resume"
 
 /**
- * 旧的简历模块结构（用于类型检查）
+ * 旧的 TextSegment 类型（用于迁移）
  */
-interface LegacyResumeModule {
+interface LegacyTextSegment {
   id: string
-  title: string
-  subtitle?: string
-  timeRange?: string
-  content: string
-  icon?: string
-  order: number
+  text: string
+  style: {
+    fontFamily?: string
+    fontSize?: number
+    color?: string
+    bold?: boolean
+    italic?: boolean
+    underline?: boolean
+    code?: boolean
+  }
 }
 
 /**
- * 生成唯一ID
+ * 旧的 ModuleContentElement 类型（用于迁移）
  */
-const generateId = () => `id-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+interface LegacyModuleContentElement {
+  id: string
+  type: 'text' | 'bullet-list' | 'numbered-list'
+  segments: LegacyTextSegment[]
+  columnIndex: number
+  align?: 'left' | 'center' | 'right' | 'justify'
+  indent?: number
+}
 
 /**
- * 将旧的简历模块迁移到新结构
+ * 将旧的 TextSegment[] 转换为 Tiptap JSON
  */
-export function migrateModule(legacyModule: LegacyResumeModule): ResumeModule {
-  const rows: ModuleContentRow[] = []
-  let rowOrder = 0
-
-  // 如果有subtitle或timeRange，创建第一行（3列布局）
-  if (legacyModule.subtitle || legacyModule.timeRange) {
-    const elements: ModuleContentElement[] = []
-
-    // 左列：subtitle
-    elements.push({
-      id: generateId(),
-      type: 'text',
-      segments: [{
-        id: generateId(),
-        text: legacyModule.subtitle || '',
-        style: {}
-      }],
-      columnIndex: 0,
-      align: 'left',
-    })
-
-    // 中列：空
-    elements.push({
-      id: generateId(),
-      type: 'text',
-      segments: [{
-        id: generateId(),
-        text: '',
-        style: {}
-      }],
-      columnIndex: 1,
-      align: 'center',
-    })
-
-    // 右列：timeRange
-    elements.push({
-      id: generateId(),
-      type: 'text',
-      segments: [{
-        id: generateId(),
-        text: legacyModule.timeRange || '',
-        style: { color: '#0066cc' }
-      }],
-      columnIndex: 2,
-      align: 'right',
-    })
-
-    rows.push({
-      id: generateId(),
-      columns: 3,
-      elements,
-      order: rowOrder++,
-    })
+function segmentsToTiptapJSON(segments: LegacyTextSegment[]): JSONContent {
+  if (!segments || segments.length === 0) {
+    return {
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          content: [],
+        },
+      ],
+    }
   }
 
-  // 如果有content，创建内容行（1列布局）
-  if (legacyModule.content) {
-    // 将content按行分割
-    const contentLines = legacyModule.content.split('\n').filter(line => line.trim())
+  const textNodes: any[] = []
 
-    contentLines.forEach(line => {
-      // 检测是否是列表项（以 • 或数字开头）
-      const isBulletList = line.trim().startsWith('•') || line.trim().startsWith('-')
-      const isNumberedList = /^\d+\./.test(line.trim())
+  for (const segment of segments) {
+    if (!segment.text) continue
 
-      const cleanText = line
-        .replace(/^[•\-]\s*/, '')  // 移除 • 或 -
-        .replace(/^\d+\.\s*/, '')  // 移除数字列表标记
-        .trim()
+    const marks: any[] = []
 
-      const element: ModuleContentElement = {
-        id: generateId(),
-        type: isBulletList ? 'bullet-list' : isNumberedList ? 'numbered-list' : 'text',
-        segments: [{
-          id: generateId(),
-          text: cleanText,
-          style: {}
-        }],
-        columnIndex: 0,
-        align: 'left',
-      }
+    // Convert style to marks
+    if (segment.style.bold) marks.push({ type: 'bold' })
+    if (segment.style.italic) marks.push({ type: 'italic' })
+    if (segment.style.underline) marks.push({ type: 'underline' })
+    if (segment.style.code) marks.push({ type: 'code' })
 
-      rows.push({
-        id: generateId(),
-        columns: 1,
-        elements: [element],
-        order: rowOrder++,
+    // TextStyle mark for color, font family, font size
+    const textStyleAttrs: any = {}
+    if (segment.style.color) textStyleAttrs.color = segment.style.color
+    if (segment.style.fontFamily) textStyleAttrs.fontFamily = segment.style.fontFamily
+    if (segment.style.fontSize) textStyleAttrs.fontSize = `${segment.style.fontSize}pt`
+
+    if (Object.keys(textStyleAttrs).length > 0) {
+      marks.push({
+        type: 'textStyle',
+        attrs: textStyleAttrs,
       })
+    }
+
+    textNodes.push({
+      type: 'text',
+      text: segment.text,
+      marks: marks.length > 0 ? marks : undefined,
     })
   }
 
   return {
-    id: legacyModule.id,
-    title: legacyModule.title,
-    icon: legacyModule.icon,
-    order: legacyModule.order,
-    rows,
+    type: 'doc',
+    content: [
+      {
+        type: 'paragraph',
+        content: textNodes,
+      },
+    ],
   }
 }
 
 /**
- * 批量迁移简历模块
+ * 检查元素是否使用旧格式
  */
-export function migrateModules(legacyModules: any[]): ResumeModule[] {
-  return legacyModules.map(module => {
-    // 检查是否已经是新格式
-    if ('rows' in module && Array.isArray(module.rows)) {
-      return module as ResumeModule
-    }
-    // 否则进行迁移
-    return migrateModule(module as LegacyResumeModule)
-  })
+function isLegacyElement(element: any): element is LegacyModuleContentElement {
+  return 'segments' in element && Array.isArray(element.segments)
 }
 
 /**
- * 检查模块是否是旧格式
+ * 迁移单个元素
  */
-export function isLegacyModule(module: any): boolean {
-  return 'content' in module && !('rows' in module)
+function migrateElement(element: any): ModuleContentElement {
+  if (isLegacyElement(element)) {
+    // 旧格式，需要转换
+    const content = segmentsToTiptapJSON(element.segments)
+    
+    // 如果有对齐方式，应用到段落
+    if (element.align && content.content && content.content[0]) {
+      content.content[0].attrs = {
+        ...content.content[0].attrs,
+        textAlign: element.align,
+      }
+    }
+
+    return {
+      id: element.id,
+      content,
+      columnIndex: element.columnIndex,
+    }
+  }
+
+  // 已经是新格式
+  return element as ModuleContentElement
+}
+
+/**
+ * 迁移整个简历数据
+ */
+export function migrateResumeData(data: ResumeData): ResumeData {
+  const migratedModules = data.modules.map(module => ({
+    ...module,
+    rows: module.rows.map(row => ({
+      ...row,
+      elements: row.elements.map(migrateElement),
+    })),
+  }))
+
+  return {
+    ...data,
+    modules: migratedModules,
+  }
+}
+
+/**
+ * 检查数据是否需要迁移
+ */
+export function needsMigration(data: ResumeData): boolean {
+  for (const module of data.modules) {
+    for (const row of module.rows) {
+      for (const element of row.elements) {
+        if (isLegacyElement(element)) {
+          return true
+        }
+      }
+    }
+  }
+  return false
 }

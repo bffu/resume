@@ -102,44 +102,69 @@
             "elements": [
               {
                 "id": "id-1762631629762-pkpjr7d74",
-                "type": "text",
-                "segments": [
-                  {
-                    "id": "id-1762631629762-z84tt78ed",
-                    "text": "四川商务职业学院",
-                    "style": {}
-                  }
-                ],
-                "columnIndex": 0,
-                "align": "left"
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "四川商务职业学院"
+                        }
+                      ],
+                      "attrs": {
+                        "textAlign": "left"
+                      }
+                    }
+                  ]
+                },
+                "columnIndex": 0
               },
               {
                 "id": "id-1762631629762-ogsyo9aqx",
-                "type": "text",
-                "segments": [
-                  {
-                    "id": "id-1762631629762-8u3zo9gjc",
-                    "text": "",
-                    "style": {}
-                  }
-                ],
-                "columnIndex": 1,
-                "align": "center"
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [],
+                      "attrs": {
+                        "textAlign": "center"
+                      }
+                    }
+                  ]
+                },
+                "columnIndex": 1
               },
               {
                 "id": "id-1762631629762-mutwsl1be",
-                "type": "text",
-                "segments": [
-                  {
-                    "id": "id-1762631629762-zi4mr2p77",
-                    "text": "2020.09.01 ~ 2023.06.30",
-                    "style": {
-                      "color": "#0066cc"
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "2020.09.01 ~ 2023.06.30",
+                          "marks": [
+                            {
+                              "type": "textStyle",
+                              "attrs": {
+                                "color": "#0066cc"
+                              }
+                            }
+                          ]
+                        }
+                      ],
+                      "attrs": {
+                        "textAlign": "right"
+                      }
                     }
-                  }
-                ],
-                "columnIndex": 2,
-                "align": "right"
+                  ]
+                },
+                "columnIndex": 2
               }
             ],
             "order": 0
@@ -158,83 +183,116 @@
             "elements": [
               {
                 "id": "id-1762631629762-1vdyioev9",
-                "type": "text",
-                "segments": [
-                  {
-                    "id": "seg-before-1762631672004-0",
-                    "text": "（",
-                    "style": {}
-                  },
-                  {
-                    "id": "seg-selected-1762631672004-0",
-                    "text": "抱拳沉声",
-                    "style": {
-                      "color": "#f9c513"
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "（"
+                        },
+                        {
+                          "type": "text",
+                          "text": "抱拳沉声",
+                          "marks": [
+                            {
+                              "type": "textStyle",
+                              "attrs": {
+                                "color": "#f9c513"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "text": "）"
+                        },
+                        {
+                          "type": "text",
+                          "text": "我乃大专巅峰",
+                          "marks": [
+                            {
+                              "type": "textStyle",
+                              "attrs": {
+                                "color": "#d73a49"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "text": "，二转前端蛊师，修前端之道已二年半。"
+                        },
+                        {
+                          "type": "text",
+                          "text": "以视觉为蛊引",
+                          "marks": [
+                            {
+                              "type": "textStyle",
+                              "attrs": {
+                                "color": "#ea4aaa"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "text": "，代码为杀招，"
+                        },
+                        {
+                          "type": "text",
+                          "text": "炼组",
+                          "marks": [
+                            {
+                              "type": "textStyle",
+                              "attrs": {
+                                "color": "#28a745"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "text": "件如炼丹，"
+                        },
+                        {
+                          "type": "text",
+                          "text": "布状态似结",
+                          "marks": [
+                            {
+                              "type": "textStyle",
+                              "attrs": {
+                                "color": "#e36209"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "text": "阵",
+                          "marks": [
+                            {
+                              "type": "textStyle",
+                              "attrs": {
+                                "fontSize": "14pt"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "text": "。"
+                        }
+                      ],
+                      "attrs": {
+                        "textAlign": "left"
+                      }
                     }
-                  },
-                  {
-                    "id": "seg-after-1762631672004-0",
-                    "text": "）",
-                    "style": {}
-                  },
-                  {
-                    "id": "seg-selected-1762631643365-0",
-                    "text": "我乃大专巅峰",
-                    "style": {
-                      "color": "#d73a49"
-                    }
-                  },
-                  {
-                    "id": "seg-before-1762631650041-12",
-                    "text": "，二转前端蛊师，修前端之道已二年半。",
-                    "style": {}
-                  },
-                  {
-                    "id": "seg-selected-1762631650041-12",
-                    "text": "以视觉为蛊引",
-                    "style": {
-                      "color": "#ea4aaa"
-                    }
-                  },
-                  {
-                    "id": "seg-before-1762631656527-36",
-                    "text": "，代码为杀招，",
-                    "style": {}
-                  },
-                  {
-                    "id": "seg-selected-1762631656527-36",
-                    "text": "炼组",
-                    "style": {
-                      "color": "#28a745"
-                    }
-                  },
-                  {
-                    "id": "seg-before-1762631664897-45",
-                    "text": "件如炼丹，",
-                    "style": {}
-                  },
-                  {
-                    "id": "seg-selected-1762631664897-45",
-                    "text": "布状态似结",
-                    "style": {
-                      "color": "#e36209"
-                    }
-                  },
-                  {
-                    "id": "seg-selected-1762631687918-55",
-                    "text": "阵",
-                    "style": {
-                      "fontSize": 14
-                    }
-                  },
-                  {
-                    "id": "seg-after-1762631687918-55",
-                    "text": "。",
-                    "style": {}
-                  }
-                ],
-                "columnIndex": 0,
-                "align": "left"
+                  ]
+                },
+                "columnIndex": 0
               }
             ],
             "order": 0
@@ -245,16 +303,24 @@
             "elements": [
               {
                 "id": "id-1762631629762-xmxhu5ibj",
-                "type": "text",
-                "segments": [
-                  {
-                    "id": "id-1762631629762-vhd4mvhr6",
-                    "text": "（袖中飞出三道流光）吾掌三大仙蛊：一曰样式蛊，可化万般界面皮相；二曰状态蛊，能驭千重数据变化；三曰动效蛊，可令像素生灵起舞。",
-                    "style": {}
-                  }
-                ],
-                "columnIndex": 0,
-                "align": "left"
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "（袖中飞出三道流光）吾掌三大仙蛊：一曰样式蛊，可化万般界面皮相；二曰状态蛊，能驭千重数据变化；三曰动效蛊，可令像素生灵起舞。"
+                        }
+                      ],
+                      "attrs": {
+                        "textAlign": "left"
+                      }
+                    }
+                  ]
+                },
+                "columnIndex": 0
               }
             ],
             "order": 1
@@ -265,16 +331,24 @@
             "elements": [
               {
                 "id": "id-1762631629762-3z9hs4him",
-                "type": "text",
-                "segments": [
-                  {
-                    "id": "id-1762631629762-pzgibolyc",
-                    "text": "（展开蛊阵图卷）这些时日，斩过混沌需求妖兽，解过浏览器蛊毒，更在用户心海种下交互动效之蛊。凡所见之处，必以像素级精度炼之，以视觉驱动叩问前端大道。",
-                    "style": {}
-                  }
-                ],
-                "columnIndex": 0,
-                "align": "left"
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "（展开蛊阵图卷）这些时日，斩过混沌需求妖兽，解过浏览器蛊毒，更在用户心海种下交互动效之蛊。凡所见之处，必以像素级精度炼之，以视觉驱动叩问前端大道。"
+                        }
+                      ],
+                      "attrs": {
+                        "textAlign": "left"
+                      }
+                    }
+                  ]
+                },
+                "columnIndex": 0
               }
             ],
             "order": 2
@@ -285,16 +359,24 @@
             "elements": [
               {
                 "id": "id-1762631629762-uraxa95ej",
-                "type": "text",
-                "segments": [
-                  {
-                    "id": "id-1762631629762-i5uyb0fiu",
-                    "text": "（负手而立）代码如蛊，一念生万象。诸君且看——我这二年半修为，可能入得各位道友法眼？",
-                    "style": {}
-                  }
-                ],
-                "columnIndex": 0,
-                "align": "left"
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "（负手而立）代码如蛊，一念生万象。诸君且看——我这二年半修为，可能入得各位道友法眼？"
+                        }
+                      ],
+                      "attrs": {
+                        "textAlign": "left"
+                      }
+                    }
+                  ]
+                },
+                "columnIndex": 0
               }
             ],
             "order": 3
@@ -313,44 +395,69 @@
             "elements": [
               {
                 "id": "id-1762631629762-wumzbrnnr",
-                "type": "text",
-                "segments": [
-                  {
-                    "id": "id-1762631629762-o9nrnuifu",
-                    "text": "甲子洞天科技 | 前端蛊师",
-                    "style": {}
-                  }
-                ],
-                "columnIndex": 0,
-                "align": "left"
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "甲子洞天科技 | 前端蛊师"
+                        }
+                      ],
+                      "attrs": {
+                        "textAlign": "left"
+                      }
+                    }
+                  ]
+                },
+                "columnIndex": 0
               },
               {
                 "id": "id-1762631629762-m3df6rgzi",
-                "type": "text",
-                "segments": [
-                  {
-                    "id": "id-1762631629762-fyoyampdf",
-                    "text": "",
-                    "style": {}
-                  }
-                ],
-                "columnIndex": 1,
-                "align": "center"
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [],
+                      "attrs": {
+                        "textAlign": "center"
+                      }
+                    }
+                  ]
+                },
+                "columnIndex": 1
               },
               {
                 "id": "id-1762631629762-fedk8ysp4",
-                "type": "text",
-                "segments": [
-                  {
-                    "id": "id-1762631629762-tdot7pwt3",
-                    "text": "（壬寅年冬 - 今）",
-                    "style": {
-                      "color": "#0066cc"
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "（壬寅年冬 - 今）",
+                          "marks": [
+                            {
+                              "type": "textStyle",
+                              "attrs": {
+                                "color": "#0066cc"
+                              }
+                            }
+                          ]
+                        }
+                      ],
+                      "attrs": {
+                        "textAlign": "right"
+                      }
                     }
-                  }
-                ],
-                "columnIndex": 2,
-                "align": "right"
+                  ]
+                },
+                "columnIndex": 2
               }
             ],
             "order": 0
@@ -361,16 +468,24 @@
             "elements": [
               {
                 "id": "id-1762631629762-k1z2jn5nw",
-                "type": "text",
-                "segments": [
-                  {
-                    "id": "id-1762631629762-f8doipkah",
-                    "text": "镇守宗门核心产品「天机商城蛊阵」，执掌React+TypeScript丹炉。独炼「设计系统蛊池」，饲喂三百余组件供全宗弟子取用，令开发效率暴涨如潮。每逢大版本更新，吾以「可视化拖拽蛊器」降伏产品心魔，需求迭代速提五成",
-                    "style": {}
-                  }
-                ],
-                "columnIndex": 0,
-                "align": "left"
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "镇守宗门核心产品「天机商城蛊阵」，执掌React+TypeScript丹炉。独炼「设计系统蛊池」，饲喂三百余组件供全宗弟子取用，令开发效率暴涨如潮。每逢大版本更新，吾以「可视化拖拽蛊器」降伏产品心魔，需求迭代速提五成"
+                        }
+                      ],
+                      "attrs": {
+                        "textAlign": "left"
+                      }
+                    }
+                  ]
+                },
+                "columnIndex": 0
               }
             ],
             "order": 1
@@ -389,44 +504,69 @@
             "elements": [
               {
                 "id": "id-1762631629762-prfwkw3es",
-                "type": "text",
-                "segments": [
-                  {
-                    "id": "id-1762631629762-xnislsypn",
-                    "text": "天机商城蛊阵",
-                    "style": {}
-                  }
-                ],
-                "columnIndex": 0,
-                "align": "left"
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "天机商城蛊阵"
+                        }
+                      ],
+                      "attrs": {
+                        "textAlign": "left"
+                      }
+                    }
+                  ]
+                },
+                "columnIndex": 0
               },
               {
                 "id": "id-1762631629762-re5sf4gx4",
-                "type": "text",
-                "segments": [
-                  {
-                    "id": "id-1762631629762-hhs2mpvdg",
-                    "text": "",
-                    "style": {}
-                  }
-                ],
-                "columnIndex": 1,
-                "align": "center"
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [],
+                      "attrs": {
+                        "textAlign": "center"
+                      }
+                    }
+                  ]
+                },
+                "columnIndex": 1
               },
               {
                 "id": "id-1762631629762-nepxnbier",
-                "type": "text",
-                "segments": [
-                  {
-                    "id": "id-1762631629762-fqw66py1e",
-                    "text": "主炼蛊师",
-                    "style": {
-                      "color": "#0066cc"
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "主炼蛊师",
+                          "marks": [
+                            {
+                              "type": "textStyle",
+                              "attrs": {
+                                "color": "#0066cc"
+                              }
+                            }
+                          ]
+                        }
+                      ],
+                      "attrs": {
+                        "textAlign": "right"
+                      }
                     }
-                  }
-                ],
-                "columnIndex": 2,
-                "align": "right"
+                  ]
+                },
+                "columnIndex": 2
               }
             ],
             "order": 0
@@ -437,74 +577,128 @@
             "elements": [
               {
                 "id": "id-1762631629762-pcbqxin06",
-                "type": "text",
-                "segments": [
-                  {
-                    "id": "seg-before-1762631734543-0",
-                    "text": "炼就「微前端子蛊巢」，",
-                    "style": {
-                      "color": "#d73a49"
+                "content": {
+                  "type": "doc",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "炼就「微前端子蛊巢」，",
+                          "marks": [
+                            {
+                              "type": "textStyle",
+                              "attrs": {
+                                "color": "#d73a49"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "text": "贯通五大道统",
+                          "marks": [
+                            {
+                              "type": "textStyle",
+                              "attrs": {
+                                "color": "#11C439"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "text": "（React/Vue/原生），令三千页面如臂使指。独创「",
+                          "marks": [
+                            {
+                              "type": "textStyle",
+                              "attrs": {
+                                "color": "#d73a49"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "text": "性能监测蛊虫",
+                          "marks": [
+                            {
+                              "type": "textStyle",
+                              "attrs": {
+                                "color": "#E5CE72"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "text": "」，实时吐纳首屏加载、",
+                          "marks": [
+                            {
+                              "type": "textStyle",
+                              "attrs": {
+                                "color": "#d73a49"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "text": "交互反馈等十二项指标",
+                          "marks": [
+                            {
+                              "type": "textStyle",
+                              "attrs": {
+                                "color": "#0366d6"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "text": "，核心转化率提升廿五。",
+                          "marks": [
+                            {
+                              "type": "textStyle",
+                              "attrs": {
+                                "color": "#d73a49"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "text": "今此蛊阵日活百万",
+                          "marks": [
+                            {
+                              "type": "textStyle",
+                              "attrs": {
+                                "color": "#6f42c1"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "text": "，稳如磐石。",
+                          "marks": [
+                            {
+                              "type": "textStyle",
+                              "attrs": {
+                                "color": "#d73a49"
+                              }
+                            }
+                          ]
+                        }
+                      ],
+                      "attrs": {
+                        "textAlign": "left"
+                      }
                     }
-                  },
-                  {
-                    "id": "seg-selected-1762631734543-0",
-                    "text": "贯通五大道统",
-                    "style": {
-                      "color": "#11C439"
-                    }
-                  },
-                  {
-                    "id": "seg-before-1762631751666-17",
-                    "text": "（React/Vue/原生），令三千页面如臂使指。独创「",
-                    "style": {
-                      "color": "#d73a49"
-                    }
-                  },
-                  {
-                    "id": "seg-selected-1762631751666-17",
-                    "text": "性能监测蛊虫",
-                    "style": {
-                      "color": "#E5CE72"
-                    }
-                  },
-                  {
-                    "id": "seg-after-1762631751666-17",
-                    "text": "」，实时吐纳首屏加载、",
-                    "style": {
-                      "color": "#d73a49"
-                    }
-                  },
-                  {
-                    "id": "seg-selected-1762631708920-0",
-                    "text": "交互反馈等十二项指标",
-                    "style": {
-                      "color": "#0366d6"
-                    }
-                  },
-                  {
-                    "id": "seg-before-1762631719937-72",
-                    "text": "，核心转化率提升廿五。",
-                    "style": {
-                      "color": "#d73a49"
-                    }
-                  },
-                  {
-                    "id": "seg-selected-1762631719937-72",
-                    "text": "今此蛊阵日活百万",
-                    "style": {
-                      "color": "#6f42c1"
-                    }
-                  },
-                  {
-                    "id": "seg-after-1762631719937-72",
-                    "text": "，稳如磐石。",
-                    "style": {
-                      "color": "#d73a49"
-                    }
-                  }
-                ],
-                "columnIndex": 0,
-                "align": "left"
+                  ]
+                },
+                "columnIndex": 0
               }
             ],
             "order": 1
@@ -513,11 +707,11 @@
       }
     ],
     "createdAt": "2024-01-01T00:00:00.000Z",
-    "updatedAt": "2025-11-08T19:58:56.262Z",
+    "updatedAt": "2025-11-08T21:44:49.092Z",
     "avatar": ""
   },
   "metadata": {
-    "exportedAt": "2025-11-08T19:58:56.262Z",
+    "exportedAt": "2025-11-08T21:44:49.092Z",
     "appVersion": "1.0.0"
   }
 }

@@ -1,51 +1,11 @@
-"use client";
+"use client"
 
-import { Icon } from "@iconify/react";
-import type { ResumeData, TextSegment } from "@/types/resume";
+import { Icon } from "@iconify/react"
+import type { ResumeData } from "@/types/resume"
+import RichTextRenderer from "./rich-text-renderer"
 
 interface ResumePreviewProps {
-  resumeData: ResumeData;
-}
-
-/**
- * 渲染文本片段
- */
-function renderSegments(segments: TextSegment[]) {
-  return segments.map((segment) => {
-    const style: React.CSSProperties = {
-      fontFamily: segment.style.fontFamily,
-      fontSize: segment.style.fontSize ? `${segment.style.fontSize}pt` : undefined,
-      color: segment.style.color,
-      fontWeight: segment.style.bold ? 'bold' : undefined,
-      fontStyle: segment.style.italic ? 'italic' : undefined,
-    };
-
-    if (segment.style.code) {
-      return (
-        <code
-          key={segment.id}
-          style={{
-            ...style,
-            fontFamily: 'Consolas, Monaco, monospace',
-            fontSize: '0.9em',
-            color: '#d73a49',
-            backgroundColor: '#f6f8fa',
-            padding: '2px 6px',
-            borderRadius: '3px',
-            border: '1px solid #e1e4e8',
-          }}
-        >
-          {segment.text}
-        </code>
-      );
-    }
-
-    return (
-      <span key={segment.id} style={style}>
-        {segment.text}
-      </span>
-    );
-  });
+  resumeData: ResumeData
 }
 
 /**
@@ -232,21 +192,8 @@ export default function ResumePreview({ resumeData }: ResumePreviewProps) {
                         <div
                           key={element.id}
                           className="text-sm text-foreground"
-                          style={{
-                            textAlign: element.align || 'left',
-                          }}
                         >
-                          {element.type === 'bullet-list' ? (
-                            <ul className="list-disc list-inside">
-                              <li>{renderSegments(element.segments)}</li>
-                            </ul>
-                          ) : element.type === 'numbered-list' ? (
-                            <ol className="list-decimal list-inside">
-                              <li>{renderSegments(element.segments)}</li>
-                            </ol>
-                          ) : (
-                            renderSegments(element.segments)
-                          )}
+                          <RichTextRenderer content={element.content} />
                         </div>
                       ))}
                     </div>

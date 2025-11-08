@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Icon } from "@iconify/react"
 import type { ResumeData, EditorState } from "@/types/resume"
 import { exportToMagicyanFile, downloadFile, importFromMagicyanFile } from "@/lib/resume-utils"
-import { migrateModules, isLegacyModule } from "@/lib/migrate-resume-data"
+import { migrateResumeData, needsMigration } from "@/lib/migrate-resume-data"
 import ResumePreview from "./resume-preview"
 import PersonalInfoEditor from "./personal-info-editor"
 import JobIntentionEditor from "./job-intention-editor"
@@ -100,11 +100,8 @@ export default function ResumeBuilder() {
         let demoData = importFromMagicyanFile(content)
 
         // 检查并迁移旧数据
-        if (demoData.modules.some(isLegacyModule)) {
-          demoData = {
-            ...demoData,
-            modules: migrateModules(demoData.modules),
-          }
+        if (needsMigration(demoData)) {
+          demoData = migrateResumeData(demoData)
         }
 
         setEditorState((prev) => ({
@@ -190,11 +187,8 @@ export default function ResumeBuilder() {
         let importedData = importFromMagicyanFile(content)
 
         // 检查并迁移旧数据
-        if (importedData.modules.some(isLegacyModule)) {
-          importedData = {
-            ...importedData,
-            modules: migrateModules(importedData.modules),
-          }
+        if (needsMigration(importedData)) {
+          importedData = migrateResumeData(importedData)
 
           toast({
             title: "数据已自动升级",

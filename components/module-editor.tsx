@@ -50,10 +50,16 @@ const createNewRow = (columns: 1 | 2 | 3 | 4, order: number): ModuleContentRow =
   for (let i = 0; i < columns; i++) {
     elements.push({
       id: generateId(),
-      type: 'text',
-      segments: [{ id: generateId(), text: '', style: {} }],
+      content: {
+        type: 'doc',
+        content: [
+          {
+            type: 'paragraph',
+            content: [],
+          },
+        ],
+      },
       columnIndex: i,
-      align: 'left',
     })
   }
 

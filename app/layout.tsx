@@ -4,6 +4,7 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { Toaster } from "@/components/toaster";
 import { ColorPickerProvider } from "@/components/color-picker-manager";
+import { ToolbarProvider } from "@/components/rich-text-toolbar-manager";
 import localFont from "next/font/local";
 
 // 定义 NotoSansSC 字体
@@ -39,8 +40,10 @@ html {
       </head>
       <body className={notoSansSC.className}>
         <ColorPickerProvider>
-          {children}
-          <Toaster />
+          <ToolbarProvider>
+            {children}
+            <Toaster />
+          </ToolbarProvider>
         </ColorPickerProvider>
       </body>
     </html>
