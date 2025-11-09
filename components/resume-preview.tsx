@@ -55,7 +55,7 @@ export default function ResumePreview({ resumeData }: ResumePreviewProps) {
           {(resumeData.personalInfoSection?.layout?.mode === 'inline' ||
             (resumeData.personalInfoSection?.layout?.mode === undefined && (resumeData.personalInfoSection as any)?.personalInfoInline)) ? (
             /* 单行显示模式（inline） */
-            <div className="personal-info flex items-center justify-between w-full whitespace-nowrap">
+            <div className="personal-info flex items-center justify-between w-full whitespace-nowrap" style={{ backgroundColor: '#F5F6F8', padding: '8px 12px', borderRadius: '4px' }}>
               {resumeData.personalInfoSection?.personalInfo.map((item) => (
                 <div
                   key={item.id}

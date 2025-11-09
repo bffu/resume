@@ -124,6 +124,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     width: "100%",
     flexWrap: "nowrap",
+    backgroundColor: "#F5F6F8",
+    padding: "8 12",
+    borderRadius: 4,
   },
   personalInfoInlineItem: {
     flexDirection: "row",
