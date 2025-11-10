@@ -150,7 +150,7 @@ export default function ResumePreview({ resumeData }: ResumePreviewProps) {
               const rowGapRem = 0.5; // 行间距
               const personalInfo = resumeData.personalInfoSection?.personalInfo || [];
               // 为防止某一列极长导致整体溢出，按列数设置上限宽度（ch 单位）
-              
+
 
               return (
                 <div
@@ -232,14 +232,14 @@ export default function ResumePreview({ resumeData }: ResumePreviewProps) {
                 {module.title}
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-0">
                 {/* 渲染行 */}
                 {module.rows
                   .sort((a, b) => a.order - b.order)
                   .map((row) => (
                     <div
                       key={row.id}
-                      className="grid gap-3"
+                      className="grid gap-3 items-center"
                       style={{
                         gridTemplateColumns: `repeat(${row.columns}, 1fr)`,
                       }}

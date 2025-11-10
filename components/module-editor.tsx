@@ -417,7 +417,7 @@ function EmptyRowPlaceholder({ onAddRow }: EmptyRowPlaceholderProps) {
 
   return (
     <div
-      className="relative pb-8"
+      className="relative pb-5"
       onMouseEnter={() => setHoveredEmpty(true)}
       onMouseLeave={() => setHoveredEmpty(false)}
     >
@@ -444,7 +444,7 @@ function ContentRowEditor({ row, onUpdate, onRemove, onUpdateElement, onAddRow }
   return (
     <>
       <div
-        className="relative pb-8"
+        className="relative pb-5"
         onMouseEnter={() => setHoveredRow(true)}
         onMouseLeave={() => setHoveredRow(false)}
       >

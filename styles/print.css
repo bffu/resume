@@ -187,6 +187,24 @@
     margin: 0 0 5pt 0 !important;
     line-height: 1.6 !important;
   }
+  /* 在模块行内：将段后间距减少一半，另一半转移到下一行的段前 */
+  .resume-content .resume-module .grid > div .ProseMirror > p:last-child {
+    margin-bottom: 2.5pt !important; /* 原 5pt 的一半 */
+  }
+  .resume-content .resume-module .grid > div .ProseMirror > ul:last-child > li:last-child,
+  .resume-content .resume-module .grid > div .ProseMirror > ol:last-child > li:last-child {
+    margin-bottom: 2.5pt !important; /* 列表最后一项同样减半 */
+  }
+  /* 段前：仅在有前一行时增加（避免首行顶部留白） */
+  .resume-content .resume-module .grid + .grid {
+    margin-top: 2.5pt !important;
+  }
+  /* 打印：让单行内容在最小高度内垂直居中 */
+  .resume-content .resume-module .grid > div .ProseMirror {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+  }
 
   /* 链接样式 */
   a {
@@ -259,6 +277,22 @@
   margin: 0 0 0.6em 0 !important;
   line-height: 1.6 !important;
 }
+/* 预览：单行网格行内让文本在 40px 的编辑器最小高度中垂直居中 */
+.resume-preview.resume-content .resume-module .grid > div .ProseMirror {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.resume-preview.resume-content .resume-module .grid > div .ProseMirror > p:last-child {
+  margin-bottom: 0.3em !important; /* 原 0.6em 的一半 */
+}
+.resume-preview.resume-content .resume-module .grid > div .ProseMirror > ul:last-child > li:last-child,
+.resume-preview.resume-content .resume-module .grid > div .ProseMirror > ol:last-child > li:last-child {
+  margin-bottom: 0.3em !important; /* 列表最后一项同样减半 */
+}
+.resume-preview.resume-content .resume-module .grid + .grid {
+  margin-top: 0.3em !important; /* 半数转移为段前 */
+}
 .resume-preview.resume-content li {
   margin-bottom: 0.6em !important;
   line-height: 1.6 !important;
@@ -330,6 +364,23 @@
     .resume-content .ProseMirror > p {
       margin: 0 0 0.6em 0 !important;
       line-height: 1.6 !important;
+    }
+    /* PDF 预览：在单行 40px 的最小高度中垂直居中 */
+    .resume-content .resume-module .grid > div .ProseMirror {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    /* 模块行：段后减半，段前补半 */
+    .resume-content .resume-module .grid > div .ProseMirror > p:last-child {
+      margin-bottom: 0.3em !important;
+    }
+    .resume-content .resume-module .grid > div .ProseMirror > ul:last-child > li:last-child,
+    .resume-content .resume-module .grid > div .ProseMirror > ol:last-child > li:last-child {
+      margin-bottom: 0.3em !important;
+    }
+    .resume-content .resume-module .grid + .grid {
+      margin-top: 0.3em !important;
     }
     .resume-content .ProseMirror li {
       margin-bottom: 0.6em !important;
