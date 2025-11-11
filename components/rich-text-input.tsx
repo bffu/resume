@@ -9,7 +9,8 @@ import TextAlign from '@tiptap/extension-text-align'
 import Underline from '@tiptap/extension-underline'
 import Link from '@tiptap/extension-link'
 import { Extension } from '@tiptap/core'
-import { Plugin } from 'prosemirror-state'
+import { Plugin } from '@tiptap/pm/state'
+import type { EditorView } from '@tiptap/pm/view'
 import type { ModuleContentElement, JSONContent } from "@/types/resume"
 import { useToolbarManager } from "./rich-text-toolbar-manager"
 
@@ -32,12 +33,13 @@ const FontSize = Extension.create({
           fontSize: {
             default: null,
             parseHTML: (element: HTMLElement) => element.style.fontSize || null,
-            renderHTML: (attributes: any) => {
-              if (!attributes.fontSize) {
+            renderHTML: (attributes: Record<string, unknown>) => {
+              const fontSize = typeof attributes.fontSize === 'string' ? attributes.fontSize : null;
+              if (!fontSize) {
                 return {}
               }
               return {
-                style: `font-size: ${attributes.fontSize}`,
+                style: `font-size: ${fontSize}`,
               }
             },
           },
@@ -55,7 +57,7 @@ const PlainTextPaste = Extension.create({
     return [
       new Plugin({
         props: {
-          handlePaste(view, event) {
+          handlePaste(_: EditorView, event: ClipboardEvent) {
             const e = event as ClipboardEvent
             const cd = e?.clipboardData
             if (!cd) return false
@@ -140,8 +142,6 @@ export default function RichTextInput({
     },
   })
 
-  // 粘贴逻辑已由 PlainTextPaste 扩展处理
-
   // Register editor with toolbar manager
   useEffect(() => {
     if (!editor) return
@@ -164,7 +164,7 @@ export default function RichTextInput({
     if (JSON.stringify(currentJson) !== JSON.stringify(newJson)) {
       editor.commands.setContent(newJson)
     }
-  }, [element.id]) // Only update when element ID changes
+  }, [editor, element.content, element.id]) // Update when editor or content/id changes
 
   if (!editor) {
     return null

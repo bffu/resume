@@ -152,10 +152,8 @@ export default function RichTextToolbar({ editor }: RichTextToolbarProps) {
     if (editor.isActive('bulletList')) chain.toggleBulletList()
     if (editor.isActive('orderedList')) chain.toggleOrderedList()
     // 再尝试提升 listItem，确保完全退出列表
-    // @ts-ignore listItem command is provided by StarterKit
     chain.liftListItem?.('listItem')
     // 清除段落级对齐与所有字符级样式
-    // @ts-ignore provided by TextAlign extension
     chain.unsetTextAlign?.()
     chain.unsetAllMarks()
     chain.setParagraph()

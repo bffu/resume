@@ -49,7 +49,7 @@ async function generateServerPdf(resumeData: ResumeData): Promise<Blob> {
       } else {
         detail = await res.text();
       }
-    } catch {}
+    } catch { }
     throw new Error(`Failed to generate PDF (${res.status}). ${detail}`);
   }
   return await res.blob();
@@ -83,7 +83,6 @@ export function PDFViewer({
   const hasServerPdfRef = useRef(false);
   const resumeKey = useMemo(() => JSON.stringify(resumeData), [resumeData]);
   const genIdRef = useRef(0);
-  const navigatedRef = useRef(false);
 
   useEffect(() => {
     let mounted = true;
@@ -120,16 +119,17 @@ export function PDFViewer({
         onModeChange?.("server");
         // 延迟一个宏任务，保证 spinner 先渲染
         setTimeout(() => {
-      try {
-        const form = document.createElement("form");
-        form.method = "POST";
-        const targetName = serverFilename || generatePdfPathFilename(resumeData.title || "");
-        form.action = `/api/pdf/${targetName}`;
-        form.style.display = "none";
-        const textarea = document.createElement("textarea");
-        textarea.name = "resumeData";
-        textarea.value = JSON.stringify(resumeData);
-        form.appendChild(textarea);
+          try {
+            const form = document.createElement("form");
+            form.method = "POST";
+            const parsed: ResumeData = JSON.parse(resumeKey);
+            const targetName = serverFilename || generatePdfPathFilename(parsed.title || "");
+            form.action = `/api/pdf/${targetName}`;
+            form.style.display = "none";
+            const textarea = document.createElement("textarea");
+            textarea.name = "resumeData";
+            textarea.value = JSON.stringify(parsed);
+            form.appendChild(textarea);
             document.body.appendChild(form);
             form.submit();
             // 提交后页面将导航至浏览器内置 PDF 查看器
@@ -141,7 +141,8 @@ export function PDFViewer({
       }
 
       try {
-        const blob = await generateServerPdf(resumeData);
+        const parsed: ResumeData = JSON.parse(resumeKey);
+        const blob = await generateServerPdf(parsed);
         if (!mounted) return;
         if (genIdRef.current !== currentId) return; // stale
         const url = URL.createObjectURL(blob);
@@ -150,12 +151,12 @@ export function PDFViewer({
         setMode("server");
         onModeChange?.("server");
         hasServerPdfRef.current = true;
-      } catch (e: any) {
+      } catch (e) {
         console.error(e);
         if (!mounted) return;
         if (genIdRef.current !== currentId) return; // stale
-        setError(e?.message || String(e));
-        if (!hasServerPdfRef.current || !pdfUrl) {
+        setError(e instanceof Error ? e.message : String(e));
+        if (!hasServerPdfRef.current) {
           setMode("fallback");
           onModeChange?.("fallback");
         }
@@ -167,7 +168,7 @@ export function PDFViewer({
       if (urlToRevoke) URL.revokeObjectURL(urlToRevoke);
       clearTimeout(t);
     };
-  }, [resumeKey]);
+  }, [resumeKey, onModeChange, renderNotice, serverFilename]);
 
   if (mode === "server") {
     if (renderNotice === "external") {
@@ -270,9 +271,10 @@ export function PDFDownloadLink({
   }, [resumeData, fileName, loading]);
 
   if (React.isValidElement(children)) {
-    return React.cloneElement(children as any, {
+    const child = children as React.ReactElement<{ onClick?: (e: React.MouseEvent) => void; disabled?: boolean }>;
+    return React.cloneElement(child, {
       onClick: handleClick,
-      disabled: loading || (children as any).props?.disabled,
+      disabled: loading || child.props.disabled,
     });
   }
   return (

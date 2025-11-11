@@ -23,11 +23,7 @@ export function ToolbarProvider({ children }: { children: React.ReactNode }) {
   const [activeEditor, setActiveEditor] = useState<Editor | null>(null)
   const [showToolbar, setShowToolbar] = useState(false)
   const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 })
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const isClient = typeof document !== 'undefined'
 
   const updateToolbarPosition = useCallback((editor: Editor) => {
     const { from, to } = editor.state.selection
@@ -127,7 +123,7 @@ export function ToolbarProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToolbarContext.Provider value={{ registerEditor, unregisterEditor }}>
       {children}
-      {mounted && showToolbar && activeEditor && createPortal(
+      {isClient && showToolbar && activeEditor && createPortal(
         <div
           className="fixed z-50 rich-text-toolbar"
           style={{

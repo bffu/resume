@@ -56,14 +56,6 @@ export default function PersonalInfoEditor({
     if (personalInfoSection?.layout) {
       return personalInfoSection.layout;
     }
-    // 向后兼容：如果有personalInfoInline则使用它
-    const hasPersonalInfoInline = (personalInfoSection as any)?.personalInfoInline;
-    if (hasPersonalInfoInline !== undefined) {
-      return {
-        mode: hasPersonalInfoInline ? 'inline' : 'grid',
-        itemsPerRow: hasPersonalInfoInline ? undefined : 2
-      };
-    }
     return { mode: 'grid', itemsPerRow: 2 };
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -155,20 +147,10 @@ export default function PersonalInfoEditor({
     // 同步 personalInfoSection 的变化，更新本地状态
     if (personalInfoSection) {
       setShowLabels(personalInfoSection?.showPersonalInfoLabels !== false);
-      
+
       // 更新layout状态
       if (personalInfoSection.layout) {
         setLayout(personalInfoSection.layout);
-      } else {
-        // 向后兼容：如果有personalInfoInline则转换
-        const hasPersonalInfoInline = (personalInfoSection as any)?.personalInfoInline;
-        if (hasPersonalInfoInline !== undefined) {
-          const newLayout: PersonalInfoLayout = {
-            mode: hasPersonalInfoInline ? 'inline' : 'grid',
-            itemsPerRow: hasPersonalInfoInline ? undefined : 2
-          };
-          setLayout(newLayout);
-        }
       }
     }
   }, [personalInfoSection?.showPersonalInfoLabels, personalInfoSection?.layout]);
@@ -228,12 +210,12 @@ export default function PersonalInfoEditor({
   const removePersonalInfoItem = (id: string) => {
     if (!personalInfoSection) return;
     const updatedInfo = personalInfo.filter((item) => item.id !== id);
-    
+
     // 如果删除后，当前列数大于剩余项目数，自动调整列数
     const maxCols = Math.max(Math.min(6, updatedInfo.length), 1);
     const currentCols = layout.itemsPerRow || 2;
     let newLayout = { ...layout };
-    
+
     if (currentCols > maxCols) {
       newLayout = {
         ...layout,
@@ -241,7 +223,7 @@ export default function PersonalInfoEditor({
       };
       setLayout(newLayout);
     }
-    
+
     onUpdate({
       ...personalInfoSection,
       personalInfo: updatedInfo,
@@ -275,7 +257,7 @@ export default function PersonalInfoEditor({
             <Icon icon={layout.mode === 'inline' ? "mdi:view-column" : "mdi:view-sequential"} className="w-4 h-4" />
             {layout.mode === 'inline' ? "单行显示" : "多行显示"}
           </Button>
-          
+
           {/* 每行列数选择器 - 只在grid模式下显示 */}
           {layout.mode === 'grid' && (
             <>
@@ -300,7 +282,7 @@ export default function PersonalInfoEditor({
               </Select>
             </>
           )}
-          
+
           <Button
             size="sm"
             variant="outline"
@@ -541,7 +523,7 @@ function PersonalInfoItemEditor({
           >
             <Icon icon="mdi:delete" className="w-4 h-4" />
           </Button>
-          
+
           {/* 拖拽手柄 */}
           <div
             {...dragHandleProps}

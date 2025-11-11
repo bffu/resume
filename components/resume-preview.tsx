@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client"
 
 import React, { useLayoutEffect, useRef, useState } from "react"
@@ -23,7 +24,7 @@ export default function ResumePreview({ resumeData }: ResumePreviewProps) {
     const el = leftRef.current;
     const measure = () => {
       const rect = el.getBoundingClientRect();
-      const h = Math.max(0, rect.height || (el as any).scrollHeight || 0);
+      const h = Math.max(0, rect.height || el.scrollHeight || 0);
       setRightBoxHeight(h);
     };
     // 初次 + 多轮调度，确保收缩场景也能捕获（如列数减少、模块隐藏）
@@ -31,11 +32,9 @@ export default function ResumePreview({ resumeData }: ResumePreviewProps) {
     const raf = requestAnimationFrame(measure);
     const t1 = setTimeout(measure, 0);
     const t2 = setTimeout(measure, 60);
-    const RO = (window as any).ResizeObserver;
-    const ro = RO ? new RO(measure) : undefined;
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : undefined;
     if (ro) ro.observe(el);
-    const MO = (window as any).MutationObserver;
-    const mo = MO ? new MO(() => requestAnimationFrame(measure)) : undefined;
+    const mo = typeof MutationObserver !== 'undefined' ? new MutationObserver(() => requestAnimationFrame(measure)) : undefined;
     if (mo) mo.observe(el, { subtree: true, childList: true, characterData: true, attributes: true });
     window.addEventListener('resize', measure);
     return () => {
@@ -108,8 +107,7 @@ export default function ResumePreview({ resumeData }: ResumePreviewProps) {
           )}
 
           {/* 个人信息 */}
-          {(resumeData.personalInfoSection?.layout?.mode === 'inline' ||
-            (resumeData.personalInfoSection?.layout?.mode === undefined && (resumeData.personalInfoSection as any)?.personalInfoInline)) ? (
+          {(resumeData.personalInfoSection?.layout?.mode === 'inline') ? (
             /* 单行显示模式（inline） */
             <div className="personal-info flex items-center justify-between w-full whitespace-nowrap" style={{ backgroundColor: '#F5F6F8', padding: '8px 12px', borderRadius: '4px' }}>
               {resumeData.personalInfoSection?.personalInfo.map((item) => (

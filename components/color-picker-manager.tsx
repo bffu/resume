@@ -1,5 +1,5 @@
 "use client"
-import { createContext, useContext, useState, useCallback, useEffect } from 'react'
+import { createContext, useContext, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import ColorPicker from './color-picker'
 
@@ -21,11 +21,7 @@ export function ColorPickerProvider({ children }: { children: React.ReactNode })
   const [isOpen, setIsOpen] = useState(false)
   const [initialColor, setInitialColor] = useState('#000000')
   const [onSaveCallback, setOnSaveCallback] = useState<((color: string) => void) | null>(null)
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const isClient = typeof document !== 'undefined'
 
   const openColorPicker = useCallback((color: string, onSave: (color: string) => void) => {
     setInitialColor(color)
@@ -40,7 +36,7 @@ export function ColorPickerProvider({ children }: { children: React.ReactNode })
   return (
     <ColorPickerContext.Provider value={{ openColorPicker }}>
       {children}
-      {mounted && isOpen && createPortal(
+      {isClient && isOpen && createPortal(
         <div
           className="fixed inset-0 z-50 flex items-center justify-center"
           onMouseDown={(e) => {

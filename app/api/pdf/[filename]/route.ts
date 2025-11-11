@@ -1,4 +1,4 @@
-export const runtime = "nodejs";
+﻿export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 
@@ -21,7 +21,7 @@ function getOrigin(req: Request) {
   try {
     const u = new URL(req.url);
     if (u.origin) return u.origin;
-  } catch {}
+  } catch { }
   const proto = (req.headers.get("x-forwarded-proto") || req.headers.get("scheme") || "http").split(",")[0].trim();
   const host = (req.headers.get("x-forwarded-host") || req.headers.get("host") || "").split(",")[0].trim();
   if (!host) return "";
@@ -52,7 +52,7 @@ export async function POST(req: Request, ctx: { params: { filename: string } }) 
     ]);
 
     // Body parsing: JSON, form, or raw text(JSON)
-    let resumeData: any = null;
+    let resumeData: import("@/types/resume").ResumeData | null = null;
     const ct = (req.headers.get("content-type") || "").toLowerCase();
     if (ct.includes("application/json")) {
       const body = await req.json().catch(() => null);
@@ -60,18 +60,18 @@ export async function POST(req: Request, ctx: { params: { filename: string } }) 
     } else if (ct.includes("application/x-www-form-urlencoded") || ct.includes("multipart/form-data")) {
       try {
         const form = await req.formData();
-        const val = form.get("resumeData") as any;
+        const val = form.get("resumeData");
         if (typeof val === "string") {
           resumeData = JSON.parse(val);
         } else if (val instanceof Blob) {
           const text = await val.text();
           resumeData = JSON.parse(text);
         }
-      } catch {}
+      } catch { }
     } else {
       const text = await req.text().catch(() => "");
       if (text) {
-        try { resumeData = JSON.parse(text); } catch {}
+        try { resumeData = JSON.parse(text); } catch { }
       }
     }
 
@@ -103,7 +103,7 @@ export async function POST(req: Request, ctx: { params: { filename: string } }) 
     const launchArgs = usingSystemChrome
       ? ["--headless=new", "--disable-gpu", "--no-sandbox", "--disable-dev-shm-usage"]
       : chromium.args;
-    const headless: any = usingSystemChrome ? "new" : chromium.headless;
+    const headless: import('puppeteer-core').LaunchOptions["headless"] = usingSystemChrome ? true : chromium.headless;
     const browser = await puppeteer.launch({
       args: launchArgs,
       defaultViewport: { width: 1200, height: 1600, deviceScaleFactor: 2 },
@@ -113,27 +113,41 @@ export async function POST(req: Request, ctx: { params: { filename: string } }) 
     const page = await browser.newPage();
 
     // Prepare data: inline avatar if remote
-    const preparedData = { ...resumeData } as any;
+    const preparedData: import("@/types/resume").ResumeData = { ...resumeData } as import("@/types/resume").ResumeData;
     if (preparedData.avatar) {
       preparedData.avatar = await toDataUrlIfRemote(preparedData.avatar);
     }
     await page.evaluateOnNewDocument((data) => {
       try {
         window.sessionStorage.setItem("resumeData", JSON.stringify(data));
-      } catch {}
+      } catch { }
     }, preparedData);
     await page.emulateMediaType("print");
     await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60000 });
     try { await page.waitForSelector(".resume-content, .pdf-preview-mode", { timeout: 20000 }); } catch { await new Promise(r => setTimeout(r, 500)); }
-    try { /* @ts-ignore puppeteer v23+ */ await page.waitForNetworkIdle({ idleTime: 300, timeout: 10000 }); } catch { await new Promise(r => setTimeout(r, 300)); }
+    try {
+      const anyPage = page as unknown as { waitForNetworkIdle?: (opts: { idleTime?: number; timeout?: number }) => Promise<void> };
+      if (typeof anyPage.waitForNetworkIdle === "function") {
+        await anyPage.waitForNetworkIdle({ idleTime: 300, timeout: 10000 });
+      } else {
+        await new Promise(r => setTimeout(r, 300));
+      }
+    } catch { await new Promise(r => setTimeout(r, 300)); }
     try {
       await page.waitForFunction(() => {
         const root = document.querySelector('.resume-content');
         if (!root) return false;
         return !!root.querySelector('.ProseMirror, .resume-module p, .resume-module li, .resume-module a, .resume-module span');
       }, { timeout: 30000 });
-    } catch {}
-    try { await page.evaluate(() => (document as any).fonts && (document as any).fonts.ready); } catch {}
+    } catch { }
+    try {
+      await page.evaluate(async () => {
+        const fonts = (document as unknown as { fonts?: { ready?: Promise<unknown> } }).fonts;
+        if (fonts?.ready) {
+          await fonts.ready;
+        }
+      });
+    } catch { }
 
     async function doPrint() {
       return await page.pdf({
@@ -146,8 +160,8 @@ export async function POST(req: Request, ctx: { params: { filename: string } }) 
     let pdf: Buffer | Uint8Array;
     try {
       pdf = await doPrint();
-    } catch (e: any) {
-      const msg = String(e?.message || e || "");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e || "");
       if (/Target closed|Execution context was destroyed/i.test(msg)) {
         await new Promise((r) => setTimeout(r, 300));
         pdf = await doPrint();
@@ -159,11 +173,6 @@ export async function POST(req: Request, ctx: { params: { filename: string } }) 
 
     // Content-Disposition with filename from URL param
     const inputName = ctx?.params?.filename || "resume.pdf";
-    // 解码并确保不会包含换行或路径分隔符
-    const rawNameUnsafe = decodeURIComponent(inputName);
-    const rawName = rawNameUnsafe.replace(/[\r\n]/g, "_").replace(/\//g, "_");
-    const asciiFallback = rawName.replace(/[^\x20-\x7E]/g, "_");
-    const utf8Star = `UTF-8''${encodeURIComponent(rawName)}`;
 
     // 生成并缓存 token，供浏览器下载按钮重复请求（GET）时使用
     const token = Math.random().toString(36).slice(2) + Date.now().toString(36);
@@ -184,8 +193,9 @@ export async function POST(req: Request, ctx: { params: { filename: string } }) 
         "set-cookie": setPdfTokenCookie(token),
       },
     });
-  } catch (error: any) {
-    return new Response(JSON.stringify({ error: String(error?.message || error) }), {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { "content-type": "application/json" },
     });
@@ -205,7 +215,9 @@ export async function GET(req: Request, ctx: { params: { filename: string } }) {
       const rawName = rawNameUnsafe.replace(/[\r\n]/g, "_").replace(/\//g, "_");
       const asciiFallback = rawName.replace(/[^\x20-\x7E]/g, "_");
       const utf8Star = `UTF-8''${encodeURIComponent(rawName)}`;
-      return new Response(cached.data, {
+      // Ensure BodyInit is acceptable to TypeScript: pass ArrayBuffer instead of Uint8Array
+      const body = new Uint8Array(cached.data).buffer;
+      return new Response(body, {
         headers: {
           "content-type": "application/pdf",
           "content-disposition": `inline; filename=\"${asciiFallback}\"; filename*=${utf8Star}`,
@@ -218,10 +230,11 @@ export async function GET(req: Request, ctx: { params: { filename: string } }) {
       status: 404,
       headers: { "content-type": "application/json" },
     });
-  } catch (error: any) {
-    return new Response(JSON.stringify({ error: String(error?.message || error) }), {
+  } catch (error) {
+    return new Response(JSON.stringify({ error: (error instanceof Error ? error.message : String(error)) }), {
       status: 500,
       headers: { "content-type": "application/json" },
     });
   }
 }
+

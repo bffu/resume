@@ -13,45 +13,26 @@ const DynamicPDFViewer = dynamic(
 )
 
 function PDFPreviewContent() {
-  const [resumeData, setResumeData] = useState<ResumeData | null>(null)
+  const [resumeData, setResumeData] = useState<ResumeData | null>(() => { try { if (typeof window === "undefined") return null; const s = sessionStorage.getItem("resumeData"); return s ? JSON.parse(s) : null; } catch { return null } })
   const [fallback, setFallback] = useState(false)
-  const [serverFilename, setServerFilename] = useState<string | undefined>(undefined)
+  // derive from location to avoid setState in effect
+  const serverFilename = typeof window !== 'undefined'
+    ? (window.location.pathname || '').split('/').filter(Boolean).pop()
+    : undefined
 
   useEffect(() => {
-    // 从原始 URL 解析最后一段路径作为文件名（保持原始编码，避免 %2F 被还原成 "/"）
-    try {
-      const path = window.location.pathname || "";
-      const seg = path.split('/').filter(Boolean).pop();
-      if (seg) setServerFilename(seg);
-    } catch {}
-
-    // 先检查 sessionStorage 是否有数据
-    const storedData = sessionStorage.getItem('resumeData');
-    if (storedData) {
-      try {
-        setResumeData(JSON.parse(storedData));
-      } catch (error) {
-        console.error("Failed to parse stored resume data:", error);
-      }
-    }
-
     const handleMessage = (event: MessageEvent) => {
-      if (event.data.type === 'resumeData') {
-        setResumeData(event.data.data);
-        sessionStorage.setItem('resumeData', JSON.stringify(event.data.data));
+      const payload = (event as unknown as { data?: { type?: string; data?: ResumeData } }).data;
+      if (payload?.type === 'resumeData' && payload.data) {
+        setResumeData(payload.data);
+        try { sessionStorage.setItem('resumeData', JSON.stringify(payload.data)); } catch { }
       }
     };
-
     window.addEventListener('message', handleMessage);
-
-    // 发送 ready 消息到父窗口
     if (window.opener) {
       window.opener.postMessage({ type: 'ready' }, '*');
     }
-
-    return () => {
-      window.removeEventListener('message', handleMessage);
-    };
+    return () => window.removeEventListener('message', handleMessage);
   }, [])
 
   if (!resumeData) {
@@ -103,3 +84,4 @@ export default function PDFPreviewPage() {
     </Suspense>
   )
 }
+

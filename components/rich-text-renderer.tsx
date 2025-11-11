@@ -28,12 +28,13 @@ const FontSize = Extension.create({
           fontSize: {
             default: null,
             parseHTML: (element: HTMLElement) => element.style.fontSize || null,
-            renderHTML: (attributes: any) => {
-              if (!attributes.fontSize) {
+            renderHTML: (attributes: Record<string, unknown>) => {
+              const fontSize = typeof attributes.fontSize === 'string' ? attributes.fontSize : null;
+              if (!fontSize) {
                 return {}
               }
               return {
-                style: `font-size: ${attributes.fontSize}`,
+                style: `font-size: ${fontSize}`,
               }
             },
           },

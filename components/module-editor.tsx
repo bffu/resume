@@ -375,31 +375,34 @@ function ModuleItem({
 
             {/* 内容行列表 */}
             <div className="space-y-0.5">
-              {module.rows
-                .sort((a, b) => a.order - b.order)
-                .map((row) => (
-                  <ContentRowEditor
-                    key={row.id}
-                    row={row}
-                    onUpdate={(updates) => updateRow(row.id, updates)}
-                    onRemove={() => removeRow(row.id)}
-                    onUpdateElement={(elementId, updates) => updateElement(row.id, elementId, updates)}
-                    onAddRow={addRow}
-                    onAddTagsRow={() => addTagsRow(row.id)}
-                  />
-                ))}
-
-              {module.rows.length === 0 && (
+              {module.rows.length === 0 ? (
                 <EmptyRowPlaceholder onAddRow={addRow} onAddTagsRow={() => addTagsRow()} />
+              ) : (
+                module.rows
+                  .sort((a, b) => a.order - b.order)
+                  .map((row) => (
+                    <ContentRowEditor
+                      key={row.id}
+                      row={row}
+                      onUpdate={(updates) => updateRow(row.id, updates)}
+                      onRemove={() => removeRow(row.id)}
+                      onUpdateElement={(elementId, updates) => updateElement(row.id, elementId, updates)}
+                      onAddRow={addRow}
+                      onAddTagsRow={() => addTagsRow(row.id)}
+                    />
+                  ))
               )}
             </div>
+
+            {/* 底部添加行 */}
+            <EmptyRowPlaceholder onAddRow={addRow} onAddTagsRow={() => addTagsRow()} />
           </div>
         )}
       </div>
 
       {/* 删除确认对话框 */}
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-sm">
           <AlertDialogHeader>
             <AlertDialogTitle>确认删除</AlertDialogTitle>
             <AlertDialogDescription>

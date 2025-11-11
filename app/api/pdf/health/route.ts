@@ -17,13 +17,15 @@ export async function GET() {
     const usingSystemChrome = !!envPath;
     const launchArgs = usingSystemChrome
       ? [
-          "--headless=new",
-          "--disable-gpu",
-          "--no-sandbox",
-          "--disable-dev-shm-usage",
-        ]
+        "--headless=new",
+        "--disable-gpu",
+        "--no-sandbox",
+        "--disable-dev-shm-usage",
+      ]
       : chromium.args;
-    const headless: any = usingSystemChrome ? "new" : chromium.headless;
+    // Puppeteer v23 headless option type is boolean | 'shell'.
+    // Use boolean true for both system Chrome (new headless) and bundled Chromium default.
+    const headless: import('puppeteer-core').LaunchOptions["headless"] = usingSystemChrome ? true : chromium.headless;
     const browser = await puppeteer.launch({
       args: launchArgs,
       defaultViewport: chromium.defaultViewport,
@@ -34,9 +36,10 @@ export async function GET() {
     return new Response(JSON.stringify({ ok: true }), {
       headers: { "content-type": "application/json" },
     });
-  } catch (error: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
     return new Response(
-      JSON.stringify({ ok: false, error: String(error?.message || error) }),
+      JSON.stringify({ ok: false, error: message }),
       { status: 503, headers: { "content-type": "application/json" } }
     );
   }
