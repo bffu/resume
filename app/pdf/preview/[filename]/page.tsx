@@ -15,22 +15,20 @@ const DynamicPDFViewer = dynamic(
 function PDFPreviewContent() {
   // IMPORTANT: Avoid reading sessionStorage during initial render to prevent
   // server/client markup mismatch. Initialize to null and hydrate after mount.
-  const [resumeData, setResumeData] = useState<ResumeData | null>(null)
+  const [resumeData, setResumeData] = useState<ResumeData | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = sessionStorage.getItem('resumeData');
+        if (cached) return JSON.parse(cached);
+      } catch { }
+    }
+    return null;
+  })
   const [fallback, setFallback] = useState(false)
   // derive from location to avoid setState in effect
   const serverFilename = typeof window !== 'undefined'
     ? (window.location.pathname || '').split('/').filter(Boolean).pop()
     : undefined
-
-  // Load cached data once after mount
-  useEffect(() => {
-    try {
-      const cached = sessionStorage.getItem('resumeData')
-      if (cached) {
-        setResumeData(JSON.parse(cached))
-      }
-    } catch {}
-  }, [])
 
   // Wire postMessage handshake once
   useEffect(() => {
@@ -67,31 +65,6 @@ function PDFPreviewContent() {
               <span>服务器不可用，已切换为浏览器打印。请在打印对话框中关闭“页眉和页脚”，勾选“背景图形”。</span>
               <Button size="sm" className="ml-2 h-6 px-2 py-1 text-xs" onClick={() => window.print()}>
                 打印/保存为 PDF
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                className="ml-2 h-6 px-2 py-1 text-xs"
-                onClick={() => {
-                  try {
-                    if (!resumeData) return;
-                    const form = document.createElement("form");
-                    form.method = "POST";
-                    const targetName = serverFilename || "resume.pdf";
-                    form.action = `/api/pdf/${targetName}`;
-                    form.style.display = "none";
-                    const textarea = document.createElement("textarea");
-                    textarea.name = "resumeData";
-                    textarea.value = JSON.stringify(resumeData);
-                    form.appendChild(textarea);
-                    document.body.appendChild(form);
-                    form.submit();
-                  } catch (e) {
-                    console.error(e);
-                  }
-                }}
-              >
-                尝试服务器生成
               </Button>
             </div>
           </div>

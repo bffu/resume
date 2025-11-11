@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
+import type { Options as HtmlToImageOptions } from "html-to-image/lib/types";
 
 interface ExportButtonProps {
   resumeData: ResumeData;
@@ -36,54 +37,65 @@ export function ExportButton({
         throw new Error("找不到简历预览元素");
       }
 
-      if (format === "svg") {
-        await exportAsSVG(resumeElement);
-        return;
-      }
+      // 为了避免跨域图片导致的画布污染，导出时使用克隆节点，并将远程图片通过同源代理加载
+      const { nodeForExport, cleanup } = await prepareNodeForExport(resumeElement);
+      try {
+        if (format === "svg") {
+          await exportAsSVG(nodeForExport);
+          return;
+        }
 
-      // 动态导入 html-to-image
-      const htmlToImage = await import("html-to-image");
+        // 动态导入 html-to-image
+        const htmlToImage = await import("html-to-image");
 
-      // 根据格式选择对应的方法
-      let dataUrl: string;
-      const options = {
-        quality: format === "jpg" ? 0.95 : 1,
-        pixelRatio: 2, // 提高清晰度
-        backgroundColor: "#ffffff",
-      };
+        // 根据格式选择对应的方法
+        let dataUrl: string;
+        const options: HtmlToImageOptions = {
+          quality: format === "jpg" ? 0.95 : 1,
+          pixelRatio: 2, // 提高清晰度
+          backgroundColor: "#ffffff",
+          cacheBust: true,
+          imagePlaceholder:
+            // 1x1 透明像素，若有图片加载失败用于占位，避免抛错
+            "data:image/gif;base64,R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
+        };
 
-      switch (format) {
-        case "png":
-          dataUrl = await htmlToImage.toPng(resumeElement, options);
-          break;
-        case "jpg":
-          dataUrl = await htmlToImage.toJpeg(resumeElement, options);
-          break;
-        case "webp":
-          // html-to-image 没有直接的 toWebp 方法，使用 toBlob 然后转换
-          const blob = await htmlToImage.toBlob(resumeElement, {
-            ...options,
-            type: "image/webp",
-          });
-          if (!blob) throw new Error("生成 WEBP 失败");
-          dataUrl = URL.createObjectURL(blob);
-          break;
-        default:
-          throw new Error("不支持的格式");
-      }
+        switch (format) {
+          case "png":
+            dataUrl = await htmlToImage.toPng(nodeForExport, options);
+            break;
+          case "jpg":
+            dataUrl = await htmlToImage.toJpeg(nodeForExport, options);
+            break;
+          case "webp":
+            // html-to-image 没有直接的 toWebp 方法，使用 toBlob 然后转换
+            const blob = await htmlToImage.toBlob(nodeForExport, options);
+            if (!blob) throw new Error("生成 WEBP 失败");
+            // 浏览器支持 canvas 转 webp：将 PNG/JPEG Blob 转换为 webp
+            // 若不支持，将保留原始 blob 类型
+            const webpUrl = await convertBlobToFormat(blob, "image/webp");
+            dataUrl = webpUrl ?? URL.createObjectURL(blob);
+            break;
+          default:
+            throw new Error("不支持的格式");
+        }
 
-      // 下载图片
-      const link = document.createElement("a");
-      link.href = dataUrl;
-      link.download = generatePdfFilename(resumeData.title).replace(
-        ".pdf",
-        `.${format}`
-      );
-      link.click();
+        // 下载图片
+        const link = document.createElement("a");
+        link.href = dataUrl;
+        link.download = generatePdfFilename(resumeData.title).replace(
+          ".pdf",
+          `.${format}`
+        );
+        link.click();
 
-      // 清理 URL（如果是 blob URL）
-      if (dataUrl.startsWith("blob:")) {
-        URL.revokeObjectURL(dataUrl);
+        // 清理 URL（如果是 blob URL）
+        if (dataUrl.startsWith("blob:")) {
+          URL.revokeObjectURL(dataUrl);
+        }
+      } finally {
+        // 移除导出时创建的克隆节点
+        cleanup();
       }
 
       toast({
@@ -91,10 +103,11 @@ export function ExportButton({
         description: `简历已导出为 ${format.toUpperCase()} 格式`,
       });
     } catch (e) {
-      console.error("导出图片失败:", e);
+      const msg = e instanceof Error ? e.message : JSON.stringify(e || {});
+      console.error("导出图片失败:", msg);
       toast({
         title: "导出失败",
-        description: "导出图片时发生错误，请重试",
+        description: `导出图片时发生错误：${msg}`,
         variant: "destructive",
       });
     } finally {
@@ -110,7 +123,10 @@ export function ExportButton({
       const dataUrl = await htmlToImage.toSvg(element, {
         backgroundColor: "#ffffff",
         pixelRatio: 2,
-      });
+        cacheBust: true,
+        imagePlaceholder:
+          "data:image/gif;base64,R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
+      } as HtmlToImageOptions);
 
       // 下载 SVG
       const link = document.createElement("a");
@@ -130,6 +146,91 @@ export function ExportButton({
       throw error;
     }
   };
+
+  // 将节点克隆到离屏容器，并将潜在的跨域图片改为通过同源代理加载
+  async function prepareNodeForExport(source: HTMLElement): Promise<{ nodeForExport: HTMLElement; cleanup: () => void }> {
+    const clone = source.cloneNode(true) as HTMLElement;
+    const container = document.createElement("div");
+    container.style.position = "fixed";
+    container.style.left = "-10000px";
+    container.style.top = "-10000px";
+    container.style.opacity = "0";
+    container.style.pointerEvents = "none";
+    // 固定宽高，避免在离屏容器内发生重排导致尺寸变化
+    const rect = source.getBoundingClientRect();
+    clone.style.width = `${rect.width}px`;
+    clone.style.height = `${rect.height}px`;
+    container.appendChild(clone);
+    document.body.appendChild(container);
+
+    const imgs = Array.from(clone.querySelectorAll<HTMLImageElement>("img"));
+    const originalSrc: Array<{ el: HTMLImageElement; src: string }> = [];
+
+    const sameOrigin = (url: string) => {
+      try {
+        const u = new URL(url, window.location.href);
+        return u.origin === window.location.origin;
+      } catch { return true; }
+    };
+
+    // 将远程图片切换为同源代理，避免 canvas 污染
+    for (const img of imgs) {
+      const src = img.getAttribute("src") || "";
+      if (!src || src.startsWith("data:") || src.startsWith("blob:")) continue;
+      if (!/^https?:\/\//i.test(src)) continue;
+      if (sameOrigin(src)) continue;
+      originalSrc.push({ el: img, src });
+      const proxied = `/api/image-proxy?url=${encodeURIComponent(src)}`;
+      img.setAttribute("src", proxied);
+      img.removeAttribute("crossorigin");
+    }
+
+    // 等待图片加载，最多等待 5 秒
+    await waitForImages(imgs, 5000);
+
+    const cleanup = () => {
+      // 不需要恢复 clone 的 src，因为会整体移除
+      if (container.parentNode) container.parentNode.removeChild(container);
+    };
+    return { nodeForExport: clone, cleanup };
+  }
+
+  function waitForImages(images: HTMLImageElement[], timeout = 5000) {
+    const pending = images.filter((img) => !img.complete || img.naturalWidth === 0);
+    if (pending.length === 0) return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      let done = false;
+      const finish = () => { if (!done) { done = true; resolve(); } };
+      const t = window.setTimeout(finish, timeout);
+      let remaining = pending.length;
+      const onLoad = () => {
+        remaining -= 1;
+        if (remaining <= 0) { window.clearTimeout(t); finish(); }
+      };
+      for (const img of pending) {
+        img.addEventListener("load", onLoad, { once: true });
+        img.addEventListener("error", onLoad, { once: true });
+      }
+    });
+  }
+
+  async function convertBlobToFormat(blob: Blob, mime: string): Promise<string | null> {
+    try {
+      if (!("createImageBitmap" in window)) return null;
+      const bmp = await createImageBitmap(blob);
+      const canvas = document.createElement("canvas");
+      canvas.width = bmp.width;
+      canvas.height = bmp.height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return null;
+      ctx.drawImage(bmp, 0, 0);
+      const dataUrl = canvas.toDataURL(mime);
+      try { bmp.close(); } catch { }
+      return dataUrl && dataUrl.startsWith("data:") ? dataUrl : null;
+    } catch {
+      return null;
+    }
+  }
 
   const exportAsPDF = () => {
     const filename = generatePdfFilename(resumeData.title || "");
