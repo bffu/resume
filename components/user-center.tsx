@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 // Avoid Radix Avatar/Checkbox to prevent extra deps; use basic elements
-//
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Icon } from "@iconify/react"
@@ -15,6 +14,7 @@ import type { StoredResume } from "@/types/resume"
 import { importFromMagicyanFile } from "@/lib/utils"
 import { StorageError, createEntryFromData, deleteResumes, getAllResumes } from "@/lib/storage"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import ExportButton from "@/components/export-button"
 
 type SortKey = "name" | "createdAt" | "updatedAt"
 type SortDir = "asc" | "desc"
@@ -286,6 +286,10 @@ export default function UserCenter() {
                       <Button variant="ghost" className="gap-2" onClick={() => router.push(`/view/${it.id}`)}>
                         <Icon icon="mdi:eye" className="w-4 h-4" /> 查看
                       </Button>
+                      <ExportButton
+                        resumeData={it.resumeData}
+                        variant="ghost"
+                      />
                       <Button variant="ghost" className="gap-2" onClick={() => router.push(`/edit/${it.id}`)}>
                         <Icon icon="mdi:pencil" className="w-4 h-4" /> 编辑
                       </Button>

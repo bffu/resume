@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@iconify/react";
 import type { ResumeData } from "@/types/resume";
-import { generatePdfFilename, exportToMagicyanFile, downloadFile } from "@/lib/utils";
+import { generatePdfFilename, exportToMagicyanFile, downloadFile, cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,26 +16,68 @@ import type { Options as HtmlToImageOptions } from "html-to-image/lib/types";
 
 interface ExportButtonProps {
   resumeData: ResumeData;
-  variant?: "default" | "outline";
-  size?: "default" | "sm";
+  variant?: "default" | "outline" | "ghost" | "destructive" | "secondary" | "link";
+  size?: "default" | "sm" | "lg" | "icon";
+  className?: string;
+  showImageOptions?: boolean; // 在没有预览面板时可关闭图片导出
 }
 
 export function ExportButton({
   resumeData,
   variant = "default",
   size = "default",
+  className,
+  showImageOptions = true,
 }: ExportButtonProps) {
   const [isExporting, setIsExporting] = useState(false);
   const { toast } = useToast();
+
+  // 在当前页面查找可用于导出的预览节点；若不存在则临时渲染一个离屏预览
+  const ensurePreviewForExport = async (): Promise<{ sourceEl: HTMLElement; cleanup: () => void }> => {
+    const existing = document.querySelector(".resume-preview") as HTMLElement | null;
+    if (existing) {
+      return { sourceEl: existing, cleanup: () => { } };
+    }
+
+    // 动态挂载一个离屏预览以支持图片导出
+    const host = document.createElement("div");
+    host.style.position = "fixed";
+    host.style.left = "-10000px";
+    host.style.top = "-10000px";
+    host.style.opacity = "0";
+    host.style.pointerEvents = "none";
+    host.className = "pdf-preview-mode"; // 采用 PDF 预览尺寸，导出清晰
+    document.body.appendChild(host);
+
+    const [{ createRoot }, { default: ResumePreview }] = await Promise.all([
+      import("react-dom/client"),
+      import("./resume-preview"),
+    ]);
+
+    const root = createRoot(host);
+    root.render(React.createElement(ResumePreview, { resumeData }));
+
+    // 等待渲染与布局生效
+    await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 30)));
+    const source = host.querySelector(".resume-preview") as HTMLElement | null;
+    if (!source) {
+      root.unmount();
+      host.remove();
+      throw new Error("无法生成预览内容用于导出");
+    }
+
+    const cleanup = () => {
+      try { root.unmount(); } catch { }
+      if (host.parentNode) host.parentNode.removeChild(host);
+    };
+    return { sourceEl: source, cleanup };
+  };
 
   const exportAsImage = async (format: "png" | "jpg" | "webp" | "svg") => {
     setIsExporting(true);
 
     try {
-      const resumeElement = document.querySelector(".resume-preview") as HTMLElement;
-      if (!resumeElement) {
-        throw new Error("找不到简历预览元素");
-      }
+      const { sourceEl: resumeElement, cleanup: cleanupPreview } = await ensurePreviewForExport();
 
       // 为了避免跨域图片导致的画布污染，导出时使用克隆节点，并将远程图片通过同源代理加载
       const { nodeForExport, cleanup } = await prepareNodeForExport(resumeElement);
@@ -96,6 +138,8 @@ export function ExportButton({
       } finally {
         // 移除导出时创建的克隆节点
         cleanup();
+        // 若使用了离屏预览，进行清理
+        cleanupPreview();
       }
 
       toast({
@@ -287,7 +331,11 @@ export function ExportButton({
           variant={variant}
           size={size}
           disabled={isExporting}
-          className="gap-2 bg-green-600 hover:bg-green-700 text-white"
+          className={cn(
+            "gap-2",
+            className,
+            variant === "default" ? "bg-green-600 hover:bg-green-700 text-white" : undefined
+          )}
         >
           <Icon icon="mdi:download" className="w-4 h-4" />
           {isExporting ? "导出中..." : "导出"}
@@ -302,22 +350,26 @@ export function ExportButton({
           <Icon icon="mdi:code-json" className="w-4 h-4 mr-2" />
           JSON 格式
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => exportAsImage("png")}>
-          <Icon icon="mdi:file-image" className="w-4 h-4 mr-2" />
-          PNG 格式
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => exportAsImage("jpg")}>
-          <Icon icon="mdi:file-jpg-box" className="w-4 h-4 mr-2" />
-          JPG 格式
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => exportAsImage("webp")}>
-          <Icon icon="mdi:file-image" className="w-4 h-4 mr-2" />
-          WEBP 格式
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => exportAsImage("svg")}>
-          <Icon icon="mdi:svg" className="w-4 h-4 mr-2" />
-          SVG 格式
-        </DropdownMenuItem>
+        {showImageOptions && (
+          <>
+            <DropdownMenuItem onClick={() => exportAsImage("png")}>
+              <Icon icon="mdi:file-image" className="w-4 h-4 mr-2" />
+              PNG 格式
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => exportAsImage("jpg")}>
+              <Icon icon="mdi:file-jpg-box" className="w-4 h-4 mr-2" />
+              JPG 格式
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => exportAsImage("webp")}>
+              <Icon icon="mdi:file-image" className="w-4 h-4 mr-2" />
+              WEBP 格式
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => exportAsImage("svg")}>
+              <Icon icon="mdi:svg" className="w-4 h-4 mr-2" />
+              SVG 格式
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
