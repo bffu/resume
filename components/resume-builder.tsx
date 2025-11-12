@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import { Icon } from "@iconify/react"
 import type { ResumeData, EditorState } from "@/types/resume"
-import { exportToMagicyanFile, downloadFile, importFromMagicyanFile, createDefaultResumeData } from "@/lib/resume-utils"
+import { importFromMagicyanFile, createDefaultResumeData } from "@/lib/resume-utils"
 import ResumePreview from "./resume-preview"
 import PersonalInfoEditor from "./personal-info-editor"
 import JobIntentionEditor from "./job-intention-editor"
@@ -112,25 +112,7 @@ export default function ResumeBuilder() {
     }))
   }, [])
 
-  const handleSave = () => {
-    try {
-      const fileContent = exportToMagicyanFile(editorState.resumeData)
-      const filename = `${editorState.resumeData.title.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, "_")}.json`
-      downloadFile(fileContent, filename)
 
-      toast({
-        title: "保存成功",
-        description: `简历已保存为 ${filename}`,
-      })
-    } catch (error) {
-      console.error("保存失败:", error)
-      toast({
-        title: "保存失败",
-        description: "文件保存时发生错误，请重试",
-        variant: "destructive",
-      })
-    }
-  }
 
   const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -225,10 +207,7 @@ export default function ResumeBuilder() {
             导入
           </Button>
 
-          <Button variant="outline" size="sm" onClick={handleSave} className="gap-2 bg-transparent">
-            <Icon icon="mdi:content-save" className="w-4 h-4" />
-            保存
-          </Button>
+
 
           <ExportButton
             resumeData={editorState.resumeData}
