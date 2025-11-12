@@ -1,37 +1,40 @@
 ﻿# 简历生成器
 > ⭐⭐⭐ **如果这个项目对您有帮助，请给个小星星！** 您的支持是我持续改进和添加新功能的动力。
 
-一个灵活且功能强大的简历构建和导出工具，帮助用户快速创建、编辑和导出干净、简洁而又专业的简历，支持所见即所得。
+一个灵活且功能强大的简历构建和导出工具，帮助用户快速创建、编辑和导出干净、简洁而又专业的简历，支持所见即所得。数据存储在浏览器，本地保存与管理简历更放心。
 
 ## 功能特点
 
+- **用户中心**: 首页集中管理你的简历，支持检索、排序、批量选择与删除、导入/导出
+- **本地存储**: 多份简历持久化到浏览器 `localStorage`，随开随用（支持 JSON 备份还原）
 - **简历编辑**: 直观的界面，轻松编辑个人信息和简历内容
 - **模块化设计**: 支持添加、删除和重排简历模块
 - **实时预览**: 即时查看简历编辑效果
-- **PDF导出**: 优先由服务端 Chromium 渲染同一份 HTML/CSS 生成干净 PDF；不可用时自动降级浏览器打印，并给出引导
+- **PDF 导出**: 优先由服务端 Chromium 渲染同一份 HTML/CSS 生成干净 PDF；不可用时自动降级浏览器打印，并给出引导
 - **图片导出**: 支持导出为 PNG、JPG、WEBP、SVG 等图片格式
-- **数据保存**: 支持保存和导入简历数据
-- **富文本支持**: 支持自由设置文本格式，如字体、文字大小、颜色、对齐方式以及是否加粗、URL链接等
+- **富文本支持**: 支持自由设置文本格式，如字体、文字大小、颜色、对齐方式以及是否加粗、URL 链接等
 - **自适应**: 支持不同模块/布局自由组合，自动调整元素尺寸
 
 ## 页面示例截图
+1. 用户中心：本地化集中管理多份简历
+![用户中心](./docs/user-center.png)
 
 1. 编辑和预览：随时查看渲染效果
 ![编辑和预览界面](./docs/edit-preview.png)
 
-2. 仅编辑：专注于编写
+1. 仅编辑：专注于编写
 ![仅编辑](./docs/edit-only.png)
 
-3. 仅预览：简历效果一览无余
+1. 仅预览：简历效果一览无余
 ![仅预览](./docs/preview-only.png)
 
-4. 自由布局：左对齐/居中对齐、列数调整等多个选项随心控制
+1. 自由布局：左对齐/居中对齐、列数调整等多个选项随心控制
 ![自由布局](./docs/multi-line.png)
 
-5. 多种导出方式：不同成品满足不同需求
+1. 多种导出方式：不同成品满足不同需求
 ![导出方式](./docs/export.png)
 
-6. 标签功能：为企业或项目等添加标签，让HR/面试官快速理解你
+1. 标签功能：为企业或项目等添加标签，让HR/面试官快速理解你
 ![标签添加](./docs/tags.png)
 
 ## 技术栈
@@ -57,11 +60,7 @@ pnpm install
 pnpm dev
 ```
 
-应用将在 [http://localhost:3000](http://localhost:3000) 启动。本地如未安装 `puppeteer-core` 和 `@sparticuz/chromium`，将自动降级为浏览器打印；要在本地使用服务端 PDF，请安装：
-
-```
-pnpm add -S puppeteer-core @sparticuz/chromium
-```
+应用将在 [http://localhost:3000](http://localhost:3000) 启动。本地已默认集成 `puppeteer-core` 与 `@sparticuz/chromium`，服务端 PDF 可直接使用；当不可用时会自动降级为浏览器打印。
 
 ### 构建生产版本
 
@@ -75,14 +74,24 @@ pnpm build
 ├── app/
 │  ├── globals.css
 │  ├── layout.tsx
-│  ├── page.tsx
-│  ├── pdf/preview/[filename]/page.tsx  # 在线 PDF 预览页（配合服务端/浏览器两种模式）
+│  ├── page.tsx                         # 首页：用户中心（本地简历管理）
+│  ├── edit/
+│  │  ├── new/page.tsx                  # 新建简历（可选携带 ?clone=ID 预填）
+│  │  └── [id]/page.tsx                 # 编辑本地已保存的简历
+│  ├── view/[id]/page.tsx               # 仅预览本地已保存的简历
+│  ├── pdf/preview/[filename]/page.tsx  # 在线 PDF 预览页（服务端优先，自动降级打印）
 │  ├── print/page.tsx                   # 打印专用页面（供 Chromium 渲染）
-│  └── api/pdf/
-│     ├── health/route.ts               # 健康检查（尝试启动 headless 浏览器）
-│     ├── [filename]/route.ts           # 生成并缓存 PDF（POST 303 重定向到 GET 下载/预览）
-│     └── route.ts                      # 直接生成并返回 PDF（Puppeteer + Chromium）
+│  ├── auth/page.tsx                    # 访问口令输入页（可选）
+│  └── api/
+│     ├── auth/route.ts                 # 认证接口（设置 Cookie）
+│     ├── image-proxy/route.ts          # 远程图片代理（用于导出防跨域）
+│     └── pdf/
+│        ├── health/route.ts            # 健康检查（尝试启动 headless 浏览器）
+│        ├── [filename]/route.ts        # 生成并缓存 PDF（POST→303→GET 下载/预览）
+│        └── route.ts                   # 直接生成并返回 PDF（Puppeteer + Chromium）
 ├── components/
+│  ├── user-center.tsx                  # 用户中心（首页）
+│  ├── export-button.tsx                # 一键导出（PDF/图片/JSON）
 │  ├── resume-builder.tsx               # 简历编辑主界面
 │  ├── resume-preview.tsx               # HTML 预览（PDF 与预览同源 HTML/CSS）
 │  ├── print-content.tsx                # 打印内容容器
@@ -92,14 +101,15 @@ pnpm build
 │  ├── use-mobile.ts
 │  └── use-toast.ts
 ├── lib/
-│  └── resume-utils.ts
+│  ├── utils.ts                         # 通用工具（默认模板、导出工具等）
+│  └── storage.ts                       # 本地存储封装（localStorage）
 ├── styles/
 │  ├── globals.css
 │  ├── print.css                        # 打印样式
 │  └── tiptap.css                       # 富文本编辑器样式
 ├── public/
 │  ├── NotoSansSC-Medium.ttf            # 字体（预览/打印共用）
-│  ├── template.json                       # 示例简历数据
+│  ├── template.json                    # 示例简历数据
 │  └── …
 └── types/
    └── resume.ts
@@ -131,6 +141,14 @@ export interface ResumeData {
 ## 功能说明
 > 基于 [resume-builder](https://github.com/magicyan418/resume-builder) 二次开发，感谢原作者的开源。
 
+### 用户中心与本地存储
+
+- 首页即用户中心：集中管理本地保存的简历条目
+- 数据存储在浏览器 `localStorage`，纯本地化更放心
+- 操作：新建、编辑、预览、复制（从现有条目预填）、导入与导出、批量选择与删除等
+- 支持按标题搜索、按名称/创建时间/更新时间排序
+- 空间不足时会提示先导出 JSON 做备份再清理
+
 ### 个人信息编辑
 
 支持添加、编辑和删除个人信息项，如姓名、电话、邮箱等。每个信息项可以设置标签、值和图标。
@@ -153,12 +171,14 @@ export interface ResumeData {
 环境变量（可选）
 - `NEXT_PUBLIC_FORCE_SERVER_PDF=true` 强制使用服务端 PDF
 - `NEXT_PUBLIC_FORCE_PRINT=true` 强制使用浏览器打印
+- `PUPPETEER_EXECUTABLE_PATH=/path/to/chrome` 或 `CHROME_PATH=/path/to/chrome` 指定系统 Chrome 可执行文件（在某些平台上更稳定）
 
 接口说明
 - `GET /api/pdf/health`：健康检查，验证 headless 启动能力
 - `POST /api/pdf`：传入`{ resumeData }`，直接返回`application/pdf`
 - `POST /api/pdf/:filename`：传入`{ resumeData }`，生成后返回`303`到`GET /api/pdf/:filename?token=...`（便于内联预览/下载）
 - `GET /api/pdf/:filename?token=...`：短期缓存（约 5 分钟）内联返回 PDF
+- `GET /api/image-proxy?url=...`：图片代理，导出图片时用于规避跨域与画布污染
 ### 部署到 Vercel
 
 - 仅支持 Node.js Runtime 的 Serverless Functions（不是 Edge）。
@@ -168,11 +188,12 @@ export interface ResumeData {
 
 ### 数据导入导出
 
-支持将简历数据导出为`.json`文件，也可以从文件导入数据。
+- 在“用户中心”可导入 `.json` 文件；导出支持 JSON、PDF、PNG/JPG/WEBP/SVG 多种格式
+- 编辑页右上角亦内置导出菜单；导出 PDF 默认走服务端，可降级浏览器打印
 
 ## 自定义主题
 
-项目使用Tailwind CSS进行样式管理，可以通过修改`tailwind.config.js`文件自定义主题颜色和其他样式。
+项目使用 Tailwind CSS 进行样式管理，可按需扩展样式与主题（见样式与组件代码）。
 
 
 ## 访问密码保护
