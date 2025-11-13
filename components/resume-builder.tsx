@@ -85,6 +85,7 @@ export default function ResumeBuilder({ initialData, template = "default", onCha
     loadTemplate()
   }, [initialData, template])
 
+  // initialData 仅用于初始值；避免在 effect 中同步 setState 触发级联渲染
   const handleViewModeChange = useCallback((mode: ViewMode) => {
     setViewMode(mode)
   }, [])

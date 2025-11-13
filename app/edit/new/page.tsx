@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { Suspense, useMemo } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import ResumeBuilder from "@/components/resume-builder"
 import type { ResumeData } from "@/types/resume"
@@ -8,7 +8,12 @@ import { createEntryFromData, StorageError, getResumeById } from "@/lib/storage"
 import { useToast } from "@/hooks/use-toast"
 
 export default function NewEditPage() {
-  return <NewEditPageContent />
+  // 包裹 Suspense 以满足 useSearchParams 的要求，fallback 为空避免“加载中...”
+  return (
+    <Suspense fallback={null}>
+      <NewEditPageContent />
+    </Suspense>
+  )
 }
 
 function NewEditPageContent() {
@@ -19,9 +24,10 @@ function NewEditPageContent() {
   const cloneId = search.get("clone")
   const useExample = search.get("example") === "1" || search.get("example") === "true"
 
-  // Clone data can be read synchronously from localStorage
+  // 同步派生克隆数据；在 SSR 阶段返回 undefined，客户端首帧即可拿到
   const clonedData: ResumeData | undefined = useMemo(() => {
     if (!cloneId) return undefined
+    if (typeof window === "undefined") return undefined
     const entry = getResumeById(cloneId)
     return entry ? { ...entry.resumeData } : undefined
   }, [cloneId])
