@@ -138,9 +138,9 @@ export function updateEntryData(id: string, data: ResumeData): StoredResume {
   return updated
 }
 
-export async function loadDefaultTemplate(): Promise<ResumeData | null> {
+async function loadTemplateFrom(path: string): Promise<ResumeData | null> {
   try {
-    const res = await fetch("/template.json")
+    const res = await fetch(path)
     if (!res.ok) return null
     const content = await res.text()
     const data = importFromMagicyanFile(content)
@@ -148,4 +148,12 @@ export async function loadDefaultTemplate(): Promise<ResumeData | null> {
   } catch {
     return null
   }
+}
+
+export function loadDefaultTemplate(): Promise<ResumeData | null> {
+  return loadTemplateFrom("/template.json")
+}
+
+export function loadExampleTemplate(): Promise<ResumeData | null> {
+  return loadTemplateFrom("/example.json")
 }

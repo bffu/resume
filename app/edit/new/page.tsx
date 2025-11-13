@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import ResumeBuilder from "@/components/resume-builder"
 import type { ResumeData } from "@/types/resume"
 import { createDefaultResumeData } from "@/lib/utils"
-import { createEntryFromData, loadDefaultTemplate, StorageError, getResumeById } from "@/lib/storage"
+import { createEntryFromData, loadDefaultTemplate, loadExampleTemplate, StorageError, getResumeById } from "@/lib/storage"
 import { useToast } from "@/hooks/use-toast"
 
 export default function NewEditPage() {
@@ -37,8 +37,9 @@ function NewEditPageContent() {
             return
           }
         }
-        // Otherwise try default template
-        const tpl = await loadDefaultTemplate()
+        // Otherwise try template (allow example override via query)
+        const useExample = search.get("example") === "1" || search.get("example") === "true"
+        const tpl = useExample ? await loadExampleTemplate() : await loadDefaultTemplate()
         const base = tpl ?? createDefaultResumeData()
         if (!base.avatar) base.avatar = "/default-avatar.jpg"
         setData(base)

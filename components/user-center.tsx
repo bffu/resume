@@ -183,6 +183,13 @@ export default function UserCenter() {
             >
               <Icon icon="mdi:import" className="w-4 h-4" /> 导入
             </Button>
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => router.push(`/edit/new?example=1`)}
+            >
+              <Icon icon="mdi:lightbulb-on" className="w-4 h-4" /> 示例
+            </Button>
             <Button onClick={handleCreate} className="gap-2">
               <Icon icon="mdi:plus" className="w-4 h-4" /> 创建简历
             </Button>
@@ -232,6 +239,13 @@ export default function UserCenter() {
                   disabled={importing}
                 >
                   <Icon icon="mdi:import" className="w-4 h-4" /> 导入
+                </Button>
+                <Button
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() => router.push(`/edit/new?example=1`)}
+                >
+                  <Icon icon="mdi:lightbulb-on" className="w-4 h-4" /> 示例
                 </Button>
               </div>
             </div>
